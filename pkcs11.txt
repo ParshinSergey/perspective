@@ -1,0 +1,17 @@
+https://stackoverflow.com/questions/68668283/intellij-is-unable-to-detect-jdk-crypto-cryptoki-package
+
+Project - Settings - Build, Execution, Deployment - Compiler - Java Compiler
+Override compiler parameters per-modele
+
+
+IT WAS
+-parameters
+--add-exports
+jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED
+
+JUST NOW
+-parameters
+--add-exports
+jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED
+--add-modules
+jdk.crypto.cryptoki
