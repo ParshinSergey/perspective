@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="1.0"
+              xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:bindings schemaLocation="http://77.88.202.130:4000/FBPGate.IFBPGateService/?xsd=xsd0">
+        <jxb:schemaBindings>
+            <jxb:package name="com.tempuri" />
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://77.88.202.130:4000/FBPGate.IFBPGateService/?xsd=xsd1">
+        <jxb:schemaBindings>
+            <jxb:package name="com.serialization"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://77.88.202.130:4000/FBPGate.IFBPGateService/?xsd=xsd2">
+        <jxb:schemaBindings>
+            <jxb:package name="com.fbpgate"/>
+            <jxb:nameXmlTransform>
+                <jxb:typeName suffix="Type" /> 
+                <jxb:elementName suffix="Element"/> 
+            </jxb:nameXmlTransform>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://77.88.202.130:4000/FBPGate.IFBPGateService/?xsd=xsd3">
+        <jxb:schemaBindings>
+            <jxb:package name="com.arrays"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+</jxb:bindings>

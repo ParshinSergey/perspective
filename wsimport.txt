@@ -1,0 +1,2 @@
+
+wsimport -b "C:\projects\perspective\src\main\resources\xml-resources\Customization.xml" -B-XautoNameResolution -d "C:\projects\perspective\src\main\java" -extension -J-Djavax.xml.accessExternalSchema=all -J-Djavax.xml.accessExternalDTD=all -keep -verbose -XadditionalHeaders -Xnocompile http://77.88.202.130:4000/FBPGate.IFBPGateService/?wsdl
