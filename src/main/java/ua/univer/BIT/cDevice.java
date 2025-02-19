@@ -1,4 +1,4 @@
-package ua.univer.ua.BIT;
+package ua.univer.BIT;
 import java.security.cert.Certificate;
 
 /*

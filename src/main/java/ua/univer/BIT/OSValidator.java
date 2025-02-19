@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package ua.univer.ua.BIT;
+package ua.univer.BIT;
 
 /**
  *

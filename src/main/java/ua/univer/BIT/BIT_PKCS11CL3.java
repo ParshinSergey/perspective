@@ -1,4 +1,4 @@
-package ua.univer.ua.BIT;
+package ua.univer.BIT;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;

@@ -14,9 +14,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 //import ua.BIT.Holder;
-import ua.univer.ua.BIT.Holder;
-import ua.univer.ua.BIT.cDevice;
-import ua.univer.ua.BIT.BIT_PKCS11CL3;
+import ua.univer.BIT.Holder;
+import ua.univer.BIT.cDevice;
+import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.avtor.DsLib.Certificate;
 //import WCFClient.*;
 import org.tempuri.IFBPGateService;
@@ -161,6 +161,7 @@ public class FBPGateClient {
         catch(Exception ex)
         {
             String ee = ex.getMessage();
+            System.out.println("Message: " + ee );
         }
     }
 }
