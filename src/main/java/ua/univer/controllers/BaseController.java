@@ -65,6 +65,9 @@ public class BaseController {
     @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> login() throws CertificateException, JAXBException {
 
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
+        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump","true");
+
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
         BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
         String strError = "";
@@ -84,7 +87,7 @@ public class BaseController {
         }
         else {
             dev = devices.get(0);
-            logger.warn("Имя устройства " + dev.DeviceName + " Тип устройства " + dev.DeviceType);
+            logger.info("Имя устройства " + dev.DeviceName + " Тип устройства " + dev.DeviceType + " конец");
         }
 
         // Список сертификатов устройства
@@ -92,9 +95,15 @@ public class BaseController {
 
         // Первый сертификат из списка
         Certificate cer = certificates.get(0);
-        logger.warn("Сертификат " + new String(cer.getEncoded()));
+        logger.info("Сертификат ");
+        logger.info("getAuthorityKeyIdentifier " + new String(cer.getAuthorityKeyIdentifier(), StandardCharsets.UTF_8));
+        logger.info("getSubjectName " + new String(cer.getPublicKeyAlgOid()));
+        logger.info("getEMail " + new String(cer.getEMail()));
+        logger.info("getSerial " + new String(cer.getSerial(), StandardCharsets.UTF_8));
+        logger.info("getPublicKeyAlgOid " + new String(cer.getPublicKeyAlgOid()));
 
         String pin = "12345678";
+        logger.info(pin);
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin)) return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
 
@@ -133,7 +142,8 @@ public class BaseController {
 
         if (loginData.login == null || loginData.login.isEmpty() || loginData.login.get(0).IsLoginOk == null || !loginData.login.get(0).IsLoginOk.equalsIgnoreCase("True"))
         {
-            return ResponseEntity.ok("Логина нет, или там пусто");
+            logger.warn("Логина нет, или там пусто");
+            return ResponseEntity.ok(xmlResponse);
         }
 
 
