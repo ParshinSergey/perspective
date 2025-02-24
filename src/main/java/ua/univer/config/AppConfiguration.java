@@ -6,6 +6,8 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.tempuri.FBPGateService;
+import org.tempuri.IFBPGateService;
 import ua.univer.fbpgateclient.LoginData;
 
 import javax.net.ssl.SSLContext;
@@ -22,6 +24,13 @@ import java.util.Properties;
 public class AppConfiguration {
     final static String PACKAGE = LoginData.class.getPackage().getName();
     public final static String DIRECTORY = "INBOX_OUTBOX";
+
+
+    @Bean
+    public IFBPGateService getGate() {
+        FBPGateService srv = new FBPGateService();
+        return srv.getWSHttpBindingFBPGate();
+    }
 
 
     @Bean
