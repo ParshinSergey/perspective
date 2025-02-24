@@ -21,11 +21,21 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +73,7 @@ public class BaseController {
 
 
     @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> login() throws CertificateException, JAXBException {
+    public ResponseEntity<String> login() throws CertificateException, JAXBException, IllegalAccessException, InvocationTargetException {
 
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
         System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump","true");
@@ -94,13 +104,49 @@ public class BaseController {
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
 
         // Первый сертификат из списка
-        Certificate cer = certificates.get(0);
+        Certificate cer = certificates.get(3);
         logger.info("Сертификат ");
+        logger.info(new String(cer.getEncoded(), StandardCharsets.UTF_8));
         logger.info("getAuthorityKeyIdentifier " + new String(cer.getAuthorityKeyIdentifier(), StandardCharsets.UTF_8));
-        logger.info("getSubjectName " + new String(cer.getPublicKeyAlgOid()));
-        logger.info("getEMail " + new String(cer.getEMail()));
+        logger.info("getSubjectName " + cer.getSubjectName("OU"));
+        logger.info("getEMail " + cer.getEMail());
         logger.info("getSerial " + new String(cer.getSerial(), StandardCharsets.UTF_8));
-        logger.info("getPublicKeyAlgOid " + new String(cer.getPublicKeyAlgOid()));
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dd1 = Instant.ofEpochMilli(cer.getNotBefore()).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dd2 = Instant.ofEpochMilli(cer.getNotAfter()).atZone(ZoneId.systemDefault()).toLocalDate();
+       // Date date = new Date(cer.getNotBefore());
+        logger.info("NotBefore " + dd1.format(dateTimeFormatter));
+       // Date date2 = new Date(cer.getNotAfter());
+        logger.info("NotAfter " + dd2.format(dateTimeFormatter));
+        logger.info("_____________________________________");
+
+
+       // Object someObject = getItSomehow();
+        for (Field field : cer.getClass().getDeclaredFields()) {
+            field.setAccessible(true); // You might want to set modifier to public first.
+            Object value = field.get(cer);
+            if (value != null) {
+                System.out.println(field.getName() + " = " + value);
+            }
+        }
+
+        logger.info("_____________________________________");
+
+        for (Method method : cer.getClass().getDeclaredMethods()) {
+            if (Modifier.isPublic(method.getModifiers())
+                    && method.getParameterTypes().length == 0
+                    && method.getReturnType() != void.class
+                    && (method.getName().startsWith("get") || method.getName().startsWith("is"))
+            ) {
+                Object value = method.invoke(cer);
+                if (value != null) {
+                    System.out.println(method.getName() + " = " + value);
+                }
+            }
+        }
+
+        logger.info("_____________________________________");
+
 
         String pin = "12345678";
         logger.info(pin);
