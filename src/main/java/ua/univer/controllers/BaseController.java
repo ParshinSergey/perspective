@@ -48,16 +48,17 @@ public class BaseController {
     Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     protected final HttpClient httpClient;
-    protected final IFBPGateService gate;
+    //protected final IFBPGateService gate;
     private String armID;
     private final BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
     private byte[] sessionKey;
     private Holder<String> err = new Holder<>("");
+    private IFBPGateService gate;
 
 
-    public BaseController(HttpClient httpClient, IFBPGateService gate) {
+    public BaseController(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.gate = gate;
+        //this.gate = gate;
     }
 
     @GetMapping(value = "/v1/test", consumes = MediaType.ALL_VALUE)
@@ -85,6 +86,11 @@ public class BaseController {
 
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
         System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
+
+        String aaa = "MIH1BgkqhkiG9w0BBwOggecwgeQCAQIxgbahgbMCAQOgOaE3MA8GCyqGJAIBAQEBAwEBBQADJAAEIeQa3YXQSuJs/NjJv0O5G2NLW4smLjL9KJ1XFFU/3cmVADAdBgoqhiQCAQEBAQMEMA8GCyqGJAIBAQEBAQEFBQAwVDBSoCIEIBm6CRskHV+0B39TneOgEb35k80I7qZc8YbdriNEHyzpBCz8hwV0PgqOngJQxUqZxg76CXJUT511bpiZFu1Akq/lYphS3PHCugfyHbwcwTAmBgkqhkiG9w0BBwEwGQYLKoYkAgEBAQEBAQIwCgQIleQVH3YZWg0=";
+        byte[] decode = Base64.getDecoder().decode(aaa);
+        System.out.println(decode);
+
 
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
         /*BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
@@ -130,6 +136,9 @@ public class BaseController {
         // Подпись данных для входа
         byte[] signedLogin = tokenLib.SignData(cer, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
+        FBPGateService srv = new FBPGateService();
+        gate = srv.getWSHttpBindingFBPGate();
+
         String xmlResponse = gate.login(armID, signedLogin);
         System.out.println(xmlResponse);
 
@@ -151,7 +160,7 @@ public class BaseController {
     }
 
 
-    @PostMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
+    @GetMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> getPortfolio() throws JAXBException {
 
         byte[] bportfolio = gate.getCryptXML(armID, ExchData.Portfolio, false);
