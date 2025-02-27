@@ -111,6 +111,12 @@
 			<systemPath>${pom.basedir}/lib/Cl3ClientLib.jar</systemPath>
 		</dependency>
 
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>1.80</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -128,6 +134,8 @@
 						</path>
 					</annotationProcessorPaths>
 					<compilerArgs>
+						<arg>--add-exports</arg>
+						<arg>java.base/sun.security.util=ALL-UNNAMED</arg>
 						<arg>--add-exports</arg>
 						<arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
 						<arg>--add-modules</arg>

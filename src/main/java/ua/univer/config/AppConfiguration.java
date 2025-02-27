@@ -26,11 +26,11 @@ public class AppConfiguration {
     public final static String DIRECTORY = "INBOX_OUTBOX";
 
 
-  /*  @Bean
+    @Bean
     public IFBPGateService getGate() {
         FBPGateService srv = new FBPGateService();
         return srv.getWSHttpBindingFBPGate();
-    }*/
+    }
 
 
     @Bean
