@@ -1,5 +1,6 @@
 package ua.univer.config;
 
+import com.sun.xml.ws.client.BindingProviderProperties;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -8,16 +9,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
+import ua.univer.fbpgateclient.CertGenerator;
 import ua.univer.fbpgateclient.LoginData;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.xml.ws.BindingProvider;
 import java.io.File;
 import java.net.http.HttpClient;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Properties;
 
 @Configuration
@@ -28,8 +32,24 @@ public class AppConfiguration {
 
     @Bean
     public IFBPGateService getGate() {
-        FBPGateService srv = new FBPGateService();
-        return srv.getWSHttpBindingFBPGate();
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
+        FBPGateService service = new FBPGateService();
+        IFBPGateService gate = service.getWSHttpBindingFBPGate();
+
+        Map<String, Object> requestContext = ((BindingProvider)gate).getRequestContext();
+        requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 3000); // Timeout in millis
+        requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 1000); // Timeout in millis
+
+        return gate;
+    }
+
+    @Bean
+    public CertGenerator getCertGenerator(){
+        CertGenerator genRSA = new CertGenerator();
+        genRSA.GenerateRSA();
+        return genRSA;
+
     }
 
 

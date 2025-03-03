@@ -50,15 +50,19 @@ public class BaseController {
 
     protected final HttpClient httpClient;
     protected final IFBPGateService gate;
+    protected final CertGenerator genRSA;
+
     private String armID;
     private final BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
     private byte[] sessionKey;
     private Holder<String> err = new Holder<>("");
+    //private CertGenerator genRSA = new CertGenerator();
 
 
-    public BaseController(HttpClient httpClient, IFBPGateService gate) {
+    public BaseController(HttpClient httpClient, IFBPGateService gate, CertGenerator genRSA) {
         this.httpClient = httpClient;
         this.gate = gate;
+        this.genRSA = genRSA;
     }
 
     @GetMapping(value = "/v1/test", consumes = MediaType.ALL_VALUE)
@@ -70,22 +74,36 @@ public class BaseController {
         FBPGateService srv = new FBPGateService();
         IFBPGateService gate = srv.getWSHttpBindingFBPGate();
 
-        String armID = "OU";
-        byte[] signedLogin = "Example".getBytes();
+        byte[] keyAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            keyAES[i] = sessionKey[i];
+        }
 
-        String xmlResponse = gate.login(armID, signedLogin);
-        System.out.println(xmlResponse);
+        byte[] ivAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            ivAES[i] = sessionKey[i+16];
+        }
+
+        byte[] encryptedMessage = genRSA.EncryptAES("simple example".getBytes(), keyAES, ivAES);
+        byte[] dencryptedMessage = genRSA.DecryptAES(encryptedMessage, keyAES, ivAES);
 
 
-        return ResponseEntity.ok().body(xmlResponse);
+
+
+        System.out.println(new String(dencryptedMessage));
+
+
+        return ResponseEntity.ok().body(new String(dencryptedMessage));
     }
 
 
     @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> login() throws CertificateException, JAXBException {
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
+       // System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+        //System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
         /*BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
@@ -103,14 +121,17 @@ public class BaseController {
         // Список сертификатов устройства
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
 
-        // Первый сертификат из списка
-        Certificate cer = certificates.get(3);
+        // Последний сертификат из списка
+        Certificate cer = certificates.get(certificates.size() - 1);
 
         String pin = "12345678";
 
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
             return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
+
+        //CertGenerator genRSA = new CertGenerator();
+        //genRSA.GenerateRSA();
 
         // Рабочее место из сертификата
         armID = cer.getSubjectName("OU");
@@ -121,9 +142,10 @@ public class BaseController {
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
                 "<ArmID>" + armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(cer.getEncoded()) + "</Base64Cert>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(cer.getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
+                "<RSAEncCert>" + Base64.getEncoder().encodeToString(genRSA.RSACert) + "</RSAEncCert>" +
                 "</LoginMsg>" +
                 "</LoginData>";
 
@@ -144,8 +166,6 @@ public class BaseController {
             return ResponseEntity.ok(xmlResponse);
         }
 
-        CertGenerator genRSA = new CertGenerator();
-        genRSA.GenerateRSA();
         // Генерируем ключ симметричного шифрования ДСТУ
         // sessionKey = tokenLib.GenerateSessionKeyB(cer, dev.UsbSlot, pin, Base64.getDecoder().decode(loginData.login.get(0).Base64Token), avPath, err);
         sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
@@ -159,7 +179,21 @@ public class BaseController {
     public ResponseEntity<String> getPortfolio() throws JAXBException {
 
         byte[] bportfolio = gate.getCryptXML(armID, ExchData.Portfolio, false);
-        byte[] decryptedPortfolio = BIT_PKCS11CL3.Decrypt(bportfolio, sessionKey, err);
+
+        byte[] keyAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            keyAES[i] = sessionKey[i];
+        }
+        byte[] ivAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            ivAES[i] = sessionKey[i+16];
+        }
+        byte[] decryptedPortfolio = genRSA.DecryptAES(bportfolio, keyAES, ivAES);
+
+
+      //  byte[] decryptedPortfolio = BIT_PKCS11CL3.Decrypt(bportfolio, sessionKey, err);
         String portfolioXML = new String(decryptedPortfolio, StandardCharsets.UTF_8);
         JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
