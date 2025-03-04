@@ -1,13 +1,11 @@
 package ua.univer.controllers;
 
+import generated.GateDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
@@ -15,15 +13,20 @@ import ua.avtor.DsLib.CertificateException;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.Holder;
 import ua.univer.BIT.cDevice;
+import ua.univer.dto.FormNewClient;
 import ua.univer.fbpgateclient.CertGenerator;
 import ua.univer.fbpgateclient.DocumentElement;
 import ua.univer.fbpgateclient.ExchData;
 import ua.univer.fbpgateclient.LoginData;
 
+import javax.validation.Valid;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,7 +35,6 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -102,9 +104,6 @@ public class BaseController {
     @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> login() throws CertificateException, JAXBException {
 
-       // System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        //System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
         /*BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
         String strError = "";
@@ -129,9 +128,6 @@ public class BaseController {
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
             return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
-
-        //CertGenerator genRSA = new CertGenerator();
-        //genRSA.GenerateRSA();
 
         // Рабочее место из сертификата
         armID = cer.getSubjectName("OU");
@@ -167,7 +163,6 @@ public class BaseController {
         }
 
         // Генерируем ключ симметричного шифрования ДСТУ
-        // sessionKey = tokenLib.GenerateSessionKeyB(cer, dev.UsbSlot, pin, Base64.getDecoder().decode(loginData.login.get(0).Base64Token), avPath, err);
         sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
 
 
@@ -192,8 +187,6 @@ public class BaseController {
         }
         byte[] decryptedPortfolio = genRSA.DecryptAES(bportfolio, keyAES, ivAES);
 
-
-      //  byte[] decryptedPortfolio = BIT_PKCS11CL3.Decrypt(bportfolio, sessionKey, err);
         String portfolioXML = new String(decryptedPortfolio, StandardCharsets.UTF_8);
         JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -339,21 +332,6 @@ public class BaseController {
         BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
         String strError = "";
         Holder<String> err = new Holder<>(strError);
-/*
-
-        String avPath = BIT_PKCS11CL3.Av337PathProg;
-        ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
-        cDevice dev = devices.get(0);
-
-        ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
-        Certificate cer = certificates.get(0);
-        String pin = "12345678";
-        if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin)) return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
-
-        // Генерируем ключ симметричного шифрования ДСТУ
-        byte[] sessionKey = tokenLib.GenerateSessionKeyB(cer, dev.UsbSlot, pin, Base64.getDecoder().decode(login.login.get(0).Base64Token), avPath, err);
-
-*/
 
         byte[] encryptedMessage = tokenLib.Encrypt(example.getBytes(StandardCharsets.UTF_8), "s".getBytes(), err);
         byte[] decryptedMessage = tokenLib.Decrypt(encryptedMessage, "s".getBytes(), err);
@@ -363,6 +341,44 @@ public class BaseController {
         }
 
         return ResponseEntity.ok().body(new String(decryptedMessage));
+    }
+
+    @PostMapping(value = "/v1/createClient")
+    public ResponseEntity<String> createClient(@RequestBody GateDataSet.NewClient newClient) throws JAXBException {
+
+
+        GateDataSet dataSet = new GateDataSet();
+       // GateDataSet.NewClient newClient = new GateDataSet.NewClient();
+
+        dataSet.getNewClient().add(newClient);
+
+        JAXBContext jc = JAXBContext.newInstance(GateDataSet.class);
+        Marshaller marshaller = jc.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        Writer writer = new StringWriter();
+        marshaller.marshal(dataSet, writer);
+        String xmlString = writer.toString();
+        System.out.println(xmlString);
+
+
+
+
+        String avPath = BIT_PKCS11CL3.Av337PathProg;
+        ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
+        cDevice dev = devices.get(0);
+        ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
+        Certificate cer = certificates.get(certificates.size() - 1);
+        String pin = "12345678";
+
+        byte[] signedLogin = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+
+
+        byte[] response = gate.sendXMLResponse(armID, "signedData".getBytes(), 37, false);
+
+
+
+        return ResponseEntity.ok().body(new String(response));
     }
 
 
