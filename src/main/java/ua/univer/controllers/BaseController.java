@@ -343,6 +343,7 @@ public class BaseController {
         return ResponseEntity.ok().body(new String(decryptedMessage));
     }
 
+
     @PostMapping(value = "/v1/createClient")
     public ResponseEntity<String> createClient(@RequestBody GateDataSet.NewClient newClient) throws JAXBException {
 
@@ -371,14 +372,34 @@ public class BaseController {
         Certificate cer = certificates.get(certificates.size() - 1);
         String pin = "12345678";
 
-        byte[] signedLogin = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+        byte[] signedXml = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
 
 
-        byte[] response = gate.sendXMLResponse(armID, "signedData".getBytes(), 37, false);
+        byte[] keyAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            keyAES[i] = sessionKey[i];
+        }
+        byte[] ivAES = new byte[16];
+        for (int i=0; i<16; i++)
+        {
+            ivAES[i] = sessionKey[i+16];
+        }
+        byte[] crypt = genRSA.EncryptAES(signedXml, keyAES, ivAES);
+
+        byte[] response = gate.sendXMLResponse(armID, crypt, 37, false);
+
+        byte[] decryptedResponse = genRSA.DecryptAES(response, keyAES, ivAES);
+
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+/*        JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
+        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        // Убираем мусор вначале xml
+        responseStr = responseStr.trim().replaceFirst("^([\\W]+)<","<");
+        DocumentElement portfolio = (DocumentElement) jaxbUnmarshaller.unmarshal(new StringReader(responseStr));*/
 
 
-
-        return ResponseEntity.ok().body(new String(response));
+        return ResponseEntity.ok().body(responseStr);
     }
 
 

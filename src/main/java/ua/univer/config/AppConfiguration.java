@@ -38,8 +38,8 @@ public class AppConfiguration {
         IFBPGateService gate = service.getWSHttpBindingFBPGate();
 
         Map<String, Object> requestContext = ((BindingProvider)gate).getRequestContext();
-        requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 3000); // Timeout in millis
-        requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 1000); // Timeout in millis
+        requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 9000); // Timeout in millis
+        requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 2000); // Timeout in millis
 
         return gate;
     }
