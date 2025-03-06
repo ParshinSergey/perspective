@@ -35,14 +35,6 @@ public class AccountController extends BaseController{
         DocumentElement document = new DocumentElement();
         document.newClients.add(newClient);
 
-/*        JAXBContext jc = JAXBContext.newInstance(DocumentElement.class);
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        Writer writer = new StringWriter();
-        marshaller.marshal(de, writer);
-        String xmlString = writer.toString();*/
-
         String xmlString = ConverterUtil.objectToXML(document);
         System.out.println(xmlString);
 
