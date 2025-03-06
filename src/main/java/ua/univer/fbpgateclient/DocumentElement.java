@@ -15,7 +15,7 @@ public class DocumentElement {
     public List<UnblockOrder> unblockOrders = new ArrayList<>();
 
     @XmlElement(name="NewClient", type=NewClient.class)
-    public List<NewClient> newClient = new ArrayList<>();
+    public List<NewClient> newClients = new ArrayList<>();
 
 
 }

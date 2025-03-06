@@ -4,6 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ua.univer.exeptions.MyException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -40,6 +45,31 @@ public class ConverterUtil {
             throw new MyException("Ошибка в методе jsonToObject. " + e.getMessage());
         }
         return t;
+    }
+
+
+    public static <T> String objectToXML(T object) {
+
+        Class<?> objectClass = object.getClass();
+        Writer writer = new StringWriter();
+        try {
+            JAXBContext jc = JAXBContext.newInstance(objectClass);
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(object, writer);
+        }
+        catch (JAXBException ex) {
+            String message = ex.getMessage();
+            if (message == null) {
+                message = ex.getCause().getMessage();
+                if (message == null) {
+                    message = "Unidentified JAXB error";
+                }
+            }
+            throw new MyException(message);
+        }
+
+        return writer.toString();
     }
 
 }

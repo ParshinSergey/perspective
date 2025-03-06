@@ -14,10 +14,7 @@ import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.Holder;
 import ua.univer.BIT.cDevice;
 import ua.univer.dto.FormNewClient;
-import ua.univer.fbpgateclient.CertGenerator;
-import ua.univer.fbpgateclient.DocumentElement;
-import ua.univer.fbpgateclient.ExchData;
-import ua.univer.fbpgateclient.LoginData;
+import ua.univer.fbpgateclient.*;
 
 import javax.validation.Valid;
 import javax.xml.bind.JAXBContext;
@@ -38,9 +35,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -54,11 +49,14 @@ public class BaseController {
     protected final IFBPGateService gate;
     protected final CertGenerator genRSA;
 
-    private String armID;
-    private final BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
-    private byte[] sessionKey;
-    private Holder<String> err = new Holder<>("");
-    //private CertGenerator genRSA = new CertGenerator();
+    protected String armID;
+    protected final BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
+    protected byte[] sessionKey;
+    protected Holder<String> err = new Holder<>("");
+    protected cDevice dev;
+    protected Certificate certificate;
+    protected String avPath = BIT_PKCS11CL3.Av337PathProg;
+    protected String pin = "12345678";
 
 
     public BaseController(HttpClient httpClient, IFBPGateService gate, CertGenerator genRSA) {
@@ -111,26 +109,26 @@ public class BaseController {
 
         // Аппаратные ключи - BIT_PKCS11CL3.Av337PathChip
         // Программные ключи
-        String avPath = BIT_PKCS11CL3.Av337PathProg;
+        //String avPath = BIT_PKCS11CL3.Av337PathProg;
         ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
 
         // Первое устройство
-        cDevice dev = devices.get(0);
+        dev = devices.get(0);
 
         // Список сертификатов устройства
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
 
         // Последний сертификат из списка
-        Certificate cer = certificates.get(certificates.size() - 1);
+        certificate = certificates.get(certificates.size() - 1);
 
-        String pin = "12345678";
+    /*    String pin = "12345678";*/
 
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
             return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
 
         // Рабочее место из сертификата
-        armID = cer.getSubjectName("OU");
+        armID = certificate.getSubjectName("OU");
 
         // XML для входа
         String strLoginData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -138,16 +136,16 @@ public class BaseController {
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
                 "<ArmID>" + armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(cer.getEncoded()) +"</Base64Cert>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(certificate.getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
-                "<RSAEncCert>" + Base64.getEncoder().encodeToString(genRSA.RSACert) + "</RSAEncCert>" +
+                "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
                 "</LoginMsg>" +
                 "</LoginData>";
 
 
         // Подпись данных для входа
-        byte[] signedLogin = tokenLib.SignData(cer, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
+        byte[] signedLogin = tokenLib.SignData(certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
         String xmlResponse = gate.login(armID, signedLogin);
         System.out.println(xmlResponse);
@@ -231,7 +229,7 @@ public class BaseController {
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
 
         // Первый сертификат из списка
-        Certificate cer = certificates.get(3);
+        Certificate cer = certificates.get(certificates.size() - 1);
         logger.info("Сертификат ");
         logger.info(new String(cer.getEncoded(), StandardCharsets.UTF_8));
         logger.info("getAuthorityKeyIdentifier " + new String(cer.getAuthorityKeyIdentifier(), StandardCharsets.UTF_8));
@@ -275,7 +273,6 @@ public class BaseController {
         logger.info("_____________________________________");
 
 
-        String pin = "12345678";
         logger.info(pin);
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin)) return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
@@ -344,21 +341,24 @@ public class BaseController {
     }
 
 
-    @PostMapping(value = "/v1/createClient")
-    public ResponseEntity<String> createClient(@RequestBody GateDataSet.NewClient newClient) throws JAXBException {
+    @PostMapping(value = "/v1/createClientOld")
+    public ResponseEntity<String> createClientOld(@RequestBody NewClient newClient) throws JAXBException {
 
 
+        DocumentElement de = new DocumentElement();
+        de.newClients.add(newClient);
+/*
         GateDataSet dataSet = new GateDataSet();
        // GateDataSet.NewClient newClient = new GateDataSet.NewClient();
 
-        dataSet.getNewClient().add(newClient);
+        dataSet.getNewClient().add(dataSet);*/
 
-        JAXBContext jc = JAXBContext.newInstance(GateDataSet.class);
+        JAXBContext jc = JAXBContext.newInstance(DocumentElement.class);
         Marshaller marshaller = jc.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         Writer writer = new StringWriter();
-        marshaller.marshal(dataSet, writer);
+        marshaller.marshal(de, writer);
         String xmlString = writer.toString();
         System.out.println(xmlString);
 
@@ -370,7 +370,6 @@ public class BaseController {
         cDevice dev = devices.get(0);
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
         Certificate cer = certificates.get(certificates.size() - 1);
-        String pin = "12345678";
 
         byte[] signedXml = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
 
@@ -387,7 +386,7 @@ public class BaseController {
         }
         byte[] crypt = genRSA.EncryptAES(signedXml, keyAES, ivAES);
 
-        byte[] response = gate.sendXMLResponse(armID, crypt, 37, false);
+        byte[] response = gate.sendXMLResponse(armID, crypt, ExchData.AddNewClient, false);
 
         byte[] decryptedResponse = genRSA.DecryptAES(response, keyAES, ivAES);
 

@@ -48,6 +48,7 @@ public static final int ContractAnnulmentList = 31;
 
 public static final int ContractOneSideReject = 32;
 public static final int ContractOneSideRejectList = 33;
+public static final int AddNewClient = 37;
 //--------------------------------
 public static final int Unknown = 9999;
 }
