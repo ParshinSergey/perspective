@@ -1,10 +1,12 @@
 package ua.univer.fbpgateclient;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.*;
 
-
+@Getter
 @XmlRootElement(name = "DocumentElement", namespace = "")
 @XmlAccessorType (XmlAccessType.FIELD)
 public class DocumentElement {

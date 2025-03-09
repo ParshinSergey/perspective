@@ -7,6 +7,8 @@ import ua.univer.exeptions.MyException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.text.DateFormat;
@@ -70,6 +72,25 @@ public class ConverterUtil {
         }
 
         return writer.toString();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static <T> T xmlToObject(String xmlStr, Class<T> clas){
+
+        xmlStr = xmlStr.trim().replaceFirst("^(\\W+)<","<");
+        T obj;
+        try {
+            JAXBContext context = JAXBContext.newInstance(clas);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            StringReader reader = new StringReader(xmlStr);
+            obj = (T) unmarshaller.unmarshal(reader);
+        }
+        catch (JAXBException e) {
+            throw new MyException("Error unmarshalling. FBP Response is: " + xmlStr);
+        }
+
+        return obj;
     }
 
 }

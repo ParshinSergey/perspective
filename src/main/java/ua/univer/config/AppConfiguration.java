@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
+import ua.avtor.DsLib.Certificate;
+import ua.avtor.DsLib.CertificateException;
+import ua.univer.BIT.BIT_PKCS11CL3;
+import ua.univer.BIT.Holder;
+import ua.univer.BIT.cDevice;
 import ua.univer.fbpgateclient.CertGenerator;
 import ua.univer.fbpgateclient.LoginData;
 
@@ -21,6 +26,7 @@ import java.net.http.HttpClient;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,6 +55,21 @@ public class AppConfiguration {
         CertGenerator genRSA = new CertGenerator();
         genRSA.GenerateRSA();
         return genRSA;
+
+    }
+
+    @Bean
+    public cDevice getDevice() throws CertificateException {
+        BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
+        Holder<String> err = new Holder<>("");
+        String avPath = BIT_PKCS11CL3.Av337PathProg;
+        ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
+        cDevice dev = devices.get(0);
+        ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
+        dev.certificate = certificates.get(certificates.size() - 1);
+        dev.armID = dev.certificate.getSubjectName("OU");
+
+        return dev;
 
     }
 

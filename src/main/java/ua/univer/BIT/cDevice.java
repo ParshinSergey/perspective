@@ -1,11 +1,13 @@
 package ua.univer.BIT;
-import java.security.cert.Certificate;
+//import java.security.cert.Certificate;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+import ua.avtor.DsLib.Certificate;
 
 /**
  *
@@ -21,7 +23,9 @@ public class cDevice
         // "TokenUnknown"
         public String DeviceType = "TokenUnknown";
         
-        public Certificate crt = null;
+        public Certificate certificate = null;
         
         public String DeviceName = "";
+
+        public String armID;
     }

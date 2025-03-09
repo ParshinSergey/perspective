@@ -1,6 +1,5 @@
 package ua.univer.controllers;
 
-import generated.GateDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -12,18 +11,16 @@ import ua.avtor.DsLib.Certificate;
 import ua.avtor.DsLib.CertificateException;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.Holder;
+import ua.univer.BIT.KeyStore;
 import ua.univer.BIT.cDevice;
-import ua.univer.dto.FormNewClient;
+import ua.univer.exeptions.MyException;
 import ua.univer.fbpgateclient.*;
+import ua.univer.util.ConverterUtil;
 
-import javax.validation.Valid;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 @RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_XML_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class BaseController {
 
     public static final String FBP_URL = "http://77.88.202.130:4000/FBPGate.IFBPGateService";
@@ -48,23 +45,24 @@ public class BaseController {
     protected final HttpClient httpClient;
     protected final IFBPGateService gate;
     protected final CertGenerator genRSA;
+    protected final cDevice dev;
+    protected final KeyStore keyStore;
 
-    protected String armID;
     protected final BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
-    protected byte[] sessionKey;
     protected Holder<String> err = new Holder<>("");
-    protected cDevice dev;
-    protected Certificate certificate;
     protected String avPath = BIT_PKCS11CL3.Av337PathProg;
     protected String pin = "12345678";
 
 
-    public BaseController(HttpClient httpClient, IFBPGateService gate, CertGenerator genRSA) {
+    public BaseController(HttpClient httpClient, IFBPGateService gate, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         this.httpClient = httpClient;
         this.gate = gate;
         this.genRSA = genRSA;
+        this.dev = dev;
+        this.keyStore = keyStore;
     }
 
+/*
     @GetMapping(value = "/v1/test", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> test(){
 
@@ -96,11 +94,11 @@ public class BaseController {
 
 
         return ResponseEntity.ok().body(new String(dencryptedMessage));
-    }
+    }*/
 
 
-    @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> login() throws CertificateException, JAXBException {
+    @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<String> login() throws JAXBException {
 
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
         /*BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
@@ -110,7 +108,7 @@ public class BaseController {
         // Аппаратные ключи - BIT_PKCS11CL3.Av337PathChip
         // Программные ключи
         //String avPath = BIT_PKCS11CL3.Av337PathProg;
-        ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
+     /*   ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
 
         // Первое устройство
         dev = devices.get(0);
@@ -121,22 +119,22 @@ public class BaseController {
         // Последний сертификат из списка
         certificate = certificates.get(certificates.size() - 1);
 
-    /*    String pin = "12345678";*/
+    *//*    String pin = "12345678";*/
 
         // Проверка пина
         if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
             return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
 
-        // Рабочее место из сертификата
-        armID = certificate.getSubjectName("OU");
+       /* // Рабочее место из сертификата
+        armID = dev.certificate.getSubjectName("OU");*/
 
         // XML для входа
         String strLoginData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<LoginData>" +
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
-                "<ArmID>" + armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(certificate.getEncoded()) +"</Base64Cert>" +
+                "<ArmID>" + dev.armID + "</ArmID>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
                 "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
@@ -145,9 +143,9 @@ public class BaseController {
 
 
         // Подпись данных для входа
-        byte[] signedLogin = tokenLib.SignData(certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
+        byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
-        String xmlResponse = gate.login(armID, signedLogin);
+        String xmlResponse = gate.login(dev.armID, signedLogin);
         System.out.println(xmlResponse);
 
         // Парсим ответ xml
@@ -161,38 +159,22 @@ public class BaseController {
         }
 
         // Генерируем ключ симметричного шифрования ДСТУ
-        sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
+        KeyStore.sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
 
 
         return ResponseEntity.ok().body(xmlResponse);
     }
 
 
-    @PostMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> getPortfolio() throws JAXBException {
+    @GetMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<String> getPortfolio() {
 
-        byte[] bportfolio = gate.getCryptXML(armID, ExchData.Portfolio, false);
-
-        byte[] keyAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            keyAES[i] = sessionKey[i];
-        }
-        byte[] ivAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            ivAES[i] = sessionKey[i+16];
-        }
-        byte[] decryptedPortfolio = genRSA.DecryptAES(bportfolio, keyAES, ivAES);
-
+        byte[] response = gate.getCryptXML(dev.armID, ExchData.Portfolio, false);
+        byte[] decryptedPortfolio = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
         String portfolioXML = new String(decryptedPortfolio, StandardCharsets.UTF_8);
-        JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        // Убираем мусор вначале xml
-        portfolioXML = portfolioXML.trim().replaceFirst("^([\\W]+)<","<");
-        DocumentElement portfolio = (DocumentElement) jaxbUnmarshaller.unmarshal(new StringReader(portfolioXML));
+        DocumentElement de = ConverterUtil.xmlToObject(portfolioXML, DocumentElement.class);
 
-        return ResponseEntity.ok().body(portfolioXML);
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(de));
     }
 
 
@@ -340,18 +322,18 @@ public class BaseController {
         return ResponseEntity.ok().body(new String(decryptedMessage));
     }
 
-
+/*
     @PostMapping(value = "/v1/createClientOld")
     public ResponseEntity<String> createClientOld(@RequestBody NewClient newClient) throws JAXBException {
 
 
         DocumentElement de = new DocumentElement();
         de.newClients.add(newClient);
-/*
+*//*
         GateDataSet dataSet = new GateDataSet();
        // GateDataSet.NewClient newClient = new GateDataSet.NewClient();
 
-        dataSet.getNewClient().add(dataSet);*/
+        dataSet.getNewClient().add(dataSet);*//*
 
         JAXBContext jc = JAXBContext.newInstance(DocumentElement.class);
         Marshaller marshaller = jc.createMarshaller();
@@ -373,7 +355,7 @@ public class BaseController {
 
         byte[] signedXml = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
 
-
+*//*
         byte[] keyAES = new byte[16];
         for (int i=0; i<16; i++)
         {
@@ -384,22 +366,24 @@ public class BaseController {
         {
             ivAES[i] = sessionKey[i+16];
         }
-        byte[] crypt = genRSA.EncryptAES(signedXml, keyAES, ivAES);
+        byte[] crypt = genRSA.EncryptAES(signedXml, keyAES, ivAES);*//*
 
-        byte[] response = gate.sendXMLResponse(armID, crypt, ExchData.AddNewClient, false);
+        byte[] crypt = genRSA.EncryptAES(signedXml, KeyStore.getFirst(), KeyStore.getSecond());
 
-        byte[] decryptedResponse = genRSA.DecryptAES(response, keyAES, ivAES);
+        byte[] response = gate.sendXMLResponse(dev.armID, crypt, ExchData.AddNewClient, false);
+
+        byte[] decryptedResponse = genRSA.DecryptAES(response,KeyStore.getFirst(), KeyStore.getSecond());
 
         String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
-/*        JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
+*//*        JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         // Убираем мусор вначале xml
         responseStr = responseStr.trim().replaceFirst("^([\\W]+)<","<");
-        DocumentElement portfolio = (DocumentElement) jaxbUnmarshaller.unmarshal(new StringReader(responseStr));*/
+        DocumentElement portfolio = (DocumentElement) jaxbUnmarshaller.unmarshal(new StringReader(responseStr));*//*
 
 
         return ResponseEntity.ok().body(responseStr);
-    }
+    }*/
 
 
 
