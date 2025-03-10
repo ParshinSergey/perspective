@@ -9,11 +9,7 @@ import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
 import ua.avtor.DsLib.CertificateException;
-import ua.univer.BIT.BIT_PKCS11CL3;
-import ua.univer.BIT.Holder;
-import ua.univer.BIT.KeyStore;
-import ua.univer.BIT.cDevice;
-import ua.univer.exeptions.MyException;
+import ua.univer.BIT.*;
 import ua.univer.fbpgateclient.*;
 import ua.univer.util.ConverterUtil;
 

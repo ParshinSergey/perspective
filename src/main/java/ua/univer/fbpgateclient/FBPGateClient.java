@@ -16,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
+import ua.univer.BIT.CertGenerator;
 import ua.univer.BIT.Holder;
 import ua.univer.BIT.cDevice;
 import ua.univer.BIT.BIT_PKCS11CL3;

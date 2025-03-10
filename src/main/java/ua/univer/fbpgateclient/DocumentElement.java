@@ -19,5 +19,8 @@ public class DocumentElement {
     @XmlElement(name="NewClient", type=NewClient.class)
     public List<NewClient> newClients = new ArrayList<>();
 
+    @XmlElement(name="AddressOrder", type=AddressOrder.class)
+    public List<AddressOrder> addressOrder = new ArrayList<>();
+
 
 }

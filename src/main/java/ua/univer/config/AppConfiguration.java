@@ -14,7 +14,7 @@ import ua.avtor.DsLib.CertificateException;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.Holder;
 import ua.univer.BIT.cDevice;
-import ua.univer.fbpgateclient.CertGenerator;
+import ua.univer.BIT.CertGenerator;
 import ua.univer.fbpgateclient.LoginData;
 
 import javax.net.ssl.SSLContext;

@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ua.univer.fbpgateclient;
+package ua.univer.BIT;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -19,14 +17,9 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -42,8 +35,6 @@ import sun.security.x509.CertificateX509Key;
 import sun.security.x509.X500Name;
 import sun.security.x509.X509CertImpl;
 import sun.security.x509.X509CertInfo;
-
-import static sun.security.x509.AlgorithmId.*;
 
 public class CertGenerator {
 
@@ -66,7 +57,7 @@ public class CertGenerator {
             X509CertInfo info = new X509CertInfo();
 
             Date since = new Date(); // Since Now
-            Date until = new Date(since.getTime() + validDays * 86400000l); // Until x days (86400000 milliseconds in one day)
+            Date until = new Date(since.getTime() + validDays * 86400000L); // Until x days (86400000 milliseconds in one day)
 
             CertificateValidity interval = new CertificateValidity(since, until);
             BigInteger sn = new BigInteger(64, new SecureRandom());
@@ -103,20 +94,19 @@ public class CertGenerator {
     private static KeyPair generateRSAKeyPair(int keySize) throws NoSuchAlgorithmException {
 
         KeyPairGenerator kpg;
-
         kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(keySize);
 
-        KeyPair kp = kpg.genKeyPair();
-
-        return kp;
+        return kpg.genKeyPair();
     }
+
 
     private static String byteArraytoBase64String(final byte[] data) {
 
         Base64.Encoder enc = Base64.getEncoder();
         return enc.encodeToString(data);
     }
+
 
     public byte[] GenerateSessionKeyB(final byte[] token) {
         try {
