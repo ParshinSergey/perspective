@@ -38,8 +38,6 @@ public class AppConfiguration {
 
     @Bean
     public IFBPGateService getGate() {
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
         FBPGateService service = new FBPGateService();
         IFBPGateService gate = service.getWSHttpBindingFBPGate();
 

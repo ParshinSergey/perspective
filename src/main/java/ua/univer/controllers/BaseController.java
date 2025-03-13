@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 
+import static ua.univer.util.FileUtil.writeStringToFile;
+
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class BaseController {
@@ -58,39 +60,7 @@ public class BaseController {
         this.keyStore = keyStore;
     }
 
-/*
-    @GetMapping(value = "/v1/test", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> test(){
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump","true");
-
-        FBPGateService srv = new FBPGateService();
-        IFBPGateService gate = srv.getWSHttpBindingFBPGate();
-
-        byte[] keyAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            keyAES[i] = sessionKey[i];
-        }
-
-        byte[] ivAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            ivAES[i] = sessionKey[i+16];
-        }
-
-        byte[] encryptedMessage = genRSA.EncryptAES("simple example".getBytes(), keyAES, ivAES);
-        byte[] dencryptedMessage = genRSA.DecryptAES(encryptedMessage, keyAES, ivAES);
-
-
-
-
-        System.out.println(new String(dencryptedMessage));
-
-
-        return ResponseEntity.ok().body(new String(dencryptedMessage));
-    }*/
 
 
     @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
@@ -165,10 +135,14 @@ public class BaseController {
     @GetMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> getPortfolio() {
 
+        logger.info("Method GetPortfolio");
         byte[] response = gate.getCryptXML(dev.armID, ExchData.Portfolio, false);
+        logger.info("dev.armID = {}", dev.armID);
         byte[] decryptedPortfolio = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
-        String portfolioXML = new String(decryptedPortfolio, StandardCharsets.UTF_8);
-        DocumentElement de = ConverterUtil.xmlToObject(portfolioXML, DocumentElement.class);
+        logger.info("decryptedPortfolio length = {}", decryptedPortfolio.length);
+        String responseStr = new String(decryptedPortfolio, StandardCharsets.UTF_8);
+        writeStringToFile(responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
 
         return ResponseEntity.ok().body(ConverterUtil.objectToJson(de));
     }
@@ -318,68 +292,53 @@ public class BaseController {
         return ResponseEntity.ok().body(new String(decryptedMessage));
     }
 
-/*
-    @PostMapping(value = "/v1/createClientOld")
-    public ResponseEntity<String> createClientOld(@RequestBody NewClient newClient) throws JAXBException {
 
 
-        DocumentElement de = new DocumentElement();
-        de.newClients.add(newClient);
-*//*
-        GateDataSet dataSet = new GateDataSet();
-       // GateDataSet.NewClient newClient = new GateDataSet.NewClient();
+    @GetMapping(value = "/v2/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<String> loginV2() throws JAXBException {
 
-        dataSet.getNewClient().add(dataSet);*//*
+        logger.info("Method Login");
 
-        JAXBContext jc = JAXBContext.newInstance(DocumentElement.class);
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    //*    String pin = "12345678";*/
 
-        Writer writer = new StringWriter();
-        marshaller.marshal(de, writer);
-        String xmlString = writer.toString();
-        System.out.println(xmlString);
+        // Проверка пина
+        if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
+            return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
+
+        String strLoginData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<LoginData>" +
+                "<LoginMsg>" +
+                "<BrokSystem>Test</BrokSystem>" +
+                "<ArmID>" + dev.armID + "</ArmID>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
+                "<Login>1</Login>" + // Логин
+                "<Pwd>1</Pwd>" + // Пароль
+                "<TokenMediaType>129</TokenMediaType>" + // Тип AES_GOST
+                "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
+                "</LoginMsg>" +
+                "</LoginData>";
 
 
+        // Подпись данных для входа
+        byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
+        String responseStr = gate.login(dev.armID, signedLogin);
+        writeStringToFile(responseStr, "Response", ".xml");
 
-        String avPath = BIT_PKCS11CL3.Av337PathProg;
-        ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
-        cDevice dev = devices.get(0);
-        ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
-        Certificate cer = certificates.get(certificates.size() - 1);
+        LoginData loginData = ConverterUtil.xmlToObject(responseStr, LoginData.class);
 
-        byte[] signedXml = tokenLib.SignData(cer, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
-
-*//*
-        byte[] keyAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            keyAES[i] = sessionKey[i];
+        if (loginData.login == null || loginData.login.isEmpty() || loginData.login.get(0).IsLoginOk == null || !loginData.login.get(0).IsLoginOk.equalsIgnoreCase("True")) {
+            logger.warn(" Логина нет, или там пусто");
+            return ResponseEntity.ok(responseStr);
         }
-        byte[] ivAES = new byte[16];
-        for (int i=0; i<16; i++)
-        {
-            ivAES[i] = sessionKey[i+16];
-        }
-        byte[] crypt = genRSA.EncryptAES(signedXml, keyAES, ivAES);*//*
 
-        byte[] crypt = genRSA.EncryptAES(signedXml, KeyStore.getFirst(), KeyStore.getSecond());
-
-        byte[] response = gate.sendXMLResponse(dev.armID, crypt, ExchData.AddNewClient, false);
-
-        byte[] decryptedResponse = genRSA.DecryptAES(response,KeyStore.getFirst(), KeyStore.getSecond());
-
-        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
-*//*        JAXBContext jaxbContext = JAXBContext.newInstance(DocumentElement.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        // Убираем мусор вначале xml
-        responseStr = responseStr.trim().replaceFirst("^([\\W]+)<","<");
-        DocumentElement portfolio = (DocumentElement) jaxbUnmarshaller.unmarshal(new StringReader(responseStr));*//*
+        // Генерируем ключ симметричного шифрования ДСТУ
+        KeyStore.sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
 
 
         return ResponseEntity.ok().body(responseStr);
-    }*/
+    }
+
 
 
 

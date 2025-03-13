@@ -1,10 +1,8 @@
 package ua.univer.controllers;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.tempuri.IFBPGateService;
 import ua.univer.BIT.CertGenerator;
 import ua.univer.BIT.KeyStore;
@@ -30,15 +28,30 @@ public class OrderController extends BaseController{
     }
 
 
+    @GetMapping(value = "/v1/getAddressOrders")
+    public ResponseEntity<String> getAddressOrders() {
+
+        logger.info("Method AddressOrders");
+        byte[] response = gate.getCryptXML(dev.armID, ExchData.AddressOrders, false);
+        byte[] decryptedResponse = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+        writeStringToFile(responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
+
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(de));
+    }
+
+
+
     @PostMapping(value = "/v1/newOrders")
     public ResponseEntity<String> newOrders (@RequestBody AddressOrder order){
 
+        logger.info("Method NewOrders");
         DocumentElement document = new DocumentElement();
         document.addressOrder.add(order);
 
         String xmlString = ConverterUtil.objectToXML(document);
-        writeStringToFile( xmlString, "NewOrder", ".xml");
-        //System.out.println(xmlString);
+        writeStringToFile(xmlString, "NewOrder", ".xml");
 
         byte[] signedXml = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
         byte[] crypt = genRSA.EncryptAES(signedXml, KeyStore.getFirst(), KeyStore.getSecond());
@@ -46,7 +59,44 @@ public class OrderController extends BaseController{
         byte[] decryptedResponse = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
 
         String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
-        writeStringToFile( xmlString, "Response", ".xml");
+        writeStringToFile( responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
+        if (de.getAddressOrder() == null) throw new MyException("Список AddressOrders пуст");
+        AddressOrder result = de.getAddressOrder().get(0);
+
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(result));
+    }
+
+    @GetMapping(value = "/v2/getAddressOrders")
+    public ResponseEntity<String> getAddressOrdersV2() {
+
+        logger.info("Method AddressOrdersV2");
+        byte[] response = gate.getCryptXML(dev.armID, ExchData.AddressOrders, false);
+        byte[] decryptedResponse = tokenLib.Decrypt(response, KeyStore.sessionKey, err);
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+        writeStringToFile(responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
+
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(de));
+    }
+
+    @PostMapping(value = "/v2/newOrders")
+    public ResponseEntity<String> newOrdersV2 (@RequestBody AddressOrder order){
+
+        logger.info("Method NewOrdersV2");
+        DocumentElement document = new DocumentElement();
+        document.addressOrder.add(order);
+
+        String xmlString = ConverterUtil.objectToXML(document);
+        writeStringToFile(xmlString, "NewOrder", ".xml");
+
+        byte[] signedXml = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+        byte[] crypt = tokenLib.Encrypt(signedXml, KeyStore.sessionKey, err);
+        byte[] response = gate.sendXMLResponse(dev.armID, crypt, ExchData.NewAddressOrder, false);
+        byte[] decryptedResponse = tokenLib.Decrypt(response, KeyStore.sessionKey, err);
+
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+        writeStringToFile( responseStr, "Response", ".xml");
         DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
         if (de.getAddressOrder() == null) throw new MyException("Список AddressOrders пуст");
         AddressOrder result = de.getAddressOrder().get(0);

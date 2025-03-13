@@ -125,7 +125,7 @@ public class CertGenerator {
         try {
             if (cipher == null)
             {
-                Security.addProvider(new BouncyCastleProvider());
+                //Security.addProvider(new BouncyCastleProvider());
                 cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
             }
             
@@ -145,7 +145,7 @@ public class CertGenerator {
         try {
             if (cipher == null)
             {
-                Security.addProvider(new BouncyCastleProvider());
+                //Security.addProvider(new BouncyCastleProvider());
                 cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
             }
             

@@ -135,6 +135,10 @@
 					</annotationProcessorPaths>
 					<compilerArgs>
 						<arg>--add-exports</arg>
+						<arg>java.base/sun.security.provider=ALL-UNNAMED</arg>
+						<arg>--add-exports</arg>
+						<arg>java.base/sun.security.pkcs=ALL-UNNAMED</arg>
+						<arg>--add-exports</arg>
 						<arg>java.base/sun.security.util=ALL-UNNAMED</arg>
 						<arg>--add-exports</arg>
 						<arg>java.base/sun.security.x509=ALL-UNNAMED</arg>
@@ -145,6 +149,16 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+
+			<!--<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<excludes>
+						<exclude>*:bcprov-jdk18:*</exclude>
+					</excludes>
+				</configuration>
+			</plugin>-->
 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -167,7 +181,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<skipXjc>false</skipXjc>
+					<skipXjc>true</skipXjc>
 					<xjbSources>
 						<xjbSource>src/main/resources/global.xjb</xjbSource>
 					</xjbSources>

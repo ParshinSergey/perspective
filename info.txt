@@ -1,0 +1,1 @@
+java -classpath bcprov-jdk18on-1.80.jar --add-exports jdk.crypto.cryptoki/sun.security.pkcs11.wrapper=ALL-UNNAMED --add-exports java.base/sun.security.x509=ALL-UNNAMED --add-exports java.base/sun.security.util=ALL-UNNAMED --add-exports java.base/sun.security.provider=ALL-UNNAMED -jar perspective-1.0.1.jar
