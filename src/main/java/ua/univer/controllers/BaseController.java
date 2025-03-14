@@ -30,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 
-import static ua.univer.util.FileUtil.writeStringToFile;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +62,7 @@ public class BaseController {
 
 
 
-    @GetMapping(value = "/v1/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
+    @GetMapping(value = "/v2/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<String> login() throws JAXBException {
 
         // Библиотека подпись/шифрование/дешифрование/сессионный ключ
@@ -131,21 +130,6 @@ public class BaseController {
         return ResponseEntity.ok().body(xmlResponse);
     }
 
-
-    @GetMapping(value = "/v1/getPortfolio", consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> getPortfolio() {
-
-        logger.info("Method GetPortfolio");
-        byte[] response = gate.getCryptXML(dev.armID, ExchData.Portfolio, false);
-        logger.info("dev.armID = {}", dev.armID);
-        byte[] decryptedPortfolio = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
-        logger.info("decryptedPortfolio length = {}", decryptedPortfolio.length);
-        String responseStr = new String(decryptedPortfolio, StandardCharsets.UTF_8);
-        writeStringToFile(responseStr, "Response", ".xml");
-        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
-
-        return ResponseEntity.ok().body(ConverterUtil.objectToJson(de));
-    }
 
 
 
@@ -277,13 +261,10 @@ public class BaseController {
     public ResponseEntity<String> crypt(){
 
         String example = "example";
+        Holder<String> err = new Holder<>("");
 
-        BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
-        String strError = "";
-        Holder<String> err = new Holder<>(strError);
-
-        byte[] encryptedMessage = tokenLib.Encrypt(example.getBytes(StandardCharsets.UTF_8), "s".getBytes(), err);
-        byte[] decryptedMessage = tokenLib.Decrypt(encryptedMessage, "s".getBytes(), err);
+        byte[] encryptedMessage = BIT_PKCS11CL3.Encrypt(example.getBytes(StandardCharsets.UTF_8), "s".getBytes(), err);
+        byte[] decryptedMessage = BIT_PKCS11CL3.Decrypt(encryptedMessage, "s".getBytes(), err);
 
         if (decryptedMessage == null){
             return ResponseEntity.ok().body("там пусто");
@@ -292,52 +273,6 @@ public class BaseController {
         return ResponseEntity.ok().body(new String(decryptedMessage));
     }
 
-
-
-    @GetMapping(value = "/v2/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<String> loginV2() throws JAXBException {
-
-        logger.info("Method Login");
-
-    //*    String pin = "12345678";*/
-
-        // Проверка пина
-        if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
-            return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
-
-        String strLoginData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<LoginData>" +
-                "<LoginMsg>" +
-                "<BrokSystem>Test</BrokSystem>" +
-                "<ArmID>" + dev.armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
-                "<Login>1</Login>" + // Логин
-                "<Pwd>1</Pwd>" + // Пароль
-                "<TokenMediaType>129</TokenMediaType>" + // Тип AES_GOST
-                "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
-                "</LoginMsg>" +
-                "</LoginData>";
-
-
-        // Подпись данных для входа
-        byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
-
-        String responseStr = gate.login(dev.armID, signedLogin);
-        writeStringToFile(responseStr, "Response", ".xml");
-
-        LoginData loginData = ConverterUtil.xmlToObject(responseStr, LoginData.class);
-
-        if (loginData.login == null || loginData.login.isEmpty() || loginData.login.get(0).IsLoginOk == null || !loginData.login.get(0).IsLoginOk.equalsIgnoreCase("True")) {
-            logger.warn(" Логина нет, или там пусто");
-            return ResponseEntity.ok(responseStr);
-        }
-
-        // Генерируем ключ симметричного шифрования ДСТУ
-        KeyStore.sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
-
-
-        return ResponseEntity.ok().body(responseStr);
-    }
 
 
 

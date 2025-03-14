@@ -32,7 +32,7 @@ import java.util.Properties;
 
 @Configuration
 public class AppConfiguration {
-    final static String PACKAGE = LoginData.class.getPackage().getName();
+
     public final static String DIRECTORY = "INBOX_OUTBOX";
 
 
@@ -48,6 +48,7 @@ public class AppConfiguration {
         return gate;
     }
 
+
     @Bean
     public CertGenerator getCertGenerator(){
         CertGenerator genRSA = new CertGenerator();
@@ -55,6 +56,7 @@ public class AppConfiguration {
         return genRSA;
 
     }
+
 
     @Bean
     public cDevice getDevice() throws CertificateException {
@@ -68,7 +70,6 @@ public class AppConfiguration {
         dev.armID = dev.certificate.getSubjectName("OU");
 
         return dev;
-
     }
 
 
@@ -84,12 +85,12 @@ public class AppConfiguration {
         return marshaller;
     }
 
+
     @Bean
     public Unmarshaller getUnmarshaller() throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(LoginData.class);
         return context.createUnmarshaller();
     }
-
 
 
     @Bean
