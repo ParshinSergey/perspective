@@ -67,7 +67,7 @@ public class AppConfiguration {
         cDevice dev = devices.get(0);
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
         dev.certificate = certificates.get(certificates.size() - 1);
-        dev.armID = dev.certificate.getSubjectName("OU");
+        cDevice.armID = dev.certificate.getSubjectName("OU");
 
         return dev;
     }

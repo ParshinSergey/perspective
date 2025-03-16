@@ -126,7 +126,7 @@ public class AddressOrder {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar termDelivery;
     @XmlElement(name = "TetmPayment")
-    @XmlSchemaType(name = "dateTime")
+    @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar tetmPayment;
     @XmlElement(name = "DepoID")
     protected Integer depoID;

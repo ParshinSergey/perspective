@@ -32,7 +32,7 @@ import java.util.Base64;
 
 
 @RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class BaseController {
 
     public static final String FBP_URL = "http://77.88.202.130:4000/FBPGate.IFBPGateService";
@@ -98,7 +98,7 @@ public class BaseController {
                 "<LoginData>" +
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
-                "<ArmID>" + dev.armID + "</ArmID>" +
+                "<ArmID>" + cDevice.armID + "</ArmID>" +
                 "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
@@ -110,7 +110,7 @@ public class BaseController {
         // Подпись данных для входа
         byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
-        String xmlResponse = gate.login(dev.armID, signedLogin);
+        String xmlResponse = gate.login(cDevice.armID, signedLogin);
         System.out.println(xmlResponse);
 
         // Парсим ответ xml

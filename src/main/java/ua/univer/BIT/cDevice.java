@@ -27,5 +27,5 @@ public class cDevice
         
         public String DeviceName = "";
 
-        public String armID;
+        public static String armID;
     }

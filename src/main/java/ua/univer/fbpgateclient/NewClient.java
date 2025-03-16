@@ -67,7 +67,7 @@ public class NewClient {
     @XmlElement(name = "CountryCode")
     protected String countryCode;
     @XmlElement(name = "PassportDateOf")
-    @XmlSchemaType(name = "dateTime")
+    @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar passportDateOf;
     @XmlElement(name = "PassportIssuerOf")
     protected String passportIssuerOf;
@@ -76,7 +76,7 @@ public class NewClient {
     @XmlElement(name = "PassportSerOf")
     protected String passportSerOf;
     @XmlElement(name = "DateOfBirth")
-    @XmlSchemaType(name = "dateTime")
+    @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar dateOfBirth;
     @XmlElement(name = "PlaceOfBirth")
     protected String placeOfBirth;

@@ -41,7 +41,7 @@ public class LoginController extends BaseController{
                 "<LoginData>" +
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
-                "<ArmID>" + dev.armID + "</ArmID>" +
+                "<ArmID>" + cDevice.armID + "</ArmID>" +
                 "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
@@ -53,7 +53,7 @@ public class LoginController extends BaseController{
         // Подпись данных для входа
         byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
-        String responseStr = gate.login(dev.armID, signedLogin);
+        String responseStr = gate.login(cDevice.armID, signedLogin);
         writeStringToFile(responseStr, "Response", ".xml");
         LoginData loginData = ConverterUtil.xmlToObject(responseStr, LoginData.class);
         if (loginData.login == null || loginData.login.isEmpty() || loginData.login.get(0).IsLoginOk == null || !loginData.login.get(0).IsLoginOk.equalsIgnoreCase("True")) {
@@ -70,9 +70,9 @@ public class LoginController extends BaseController{
     public ResponseEntity<String> getPortfolio() {
 
         logger.info("Method GetPortfolio");
-        byte[] response = gate.getCryptXML(dev.armID, ExchData.Portfolio, false);
+        byte[] response = gate.getCryptXML(cDevice.armID, ExchData.Portfolio, false);
         byte[] decryptedResponse = BIT_PKCS11CL3.Decrypt(response, KeyStore.sessionKey, err);
-        assert decryptedResponse != null : "Response is null";
+        if(decryptedResponse == null) throw new MyException("Response is null");
         String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
         writeStringToFile(responseStr, "Response", ".xml");
         DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
