@@ -99,7 +99,7 @@ public class BaseController {
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
                 "<ArmID>" + cDevice.armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.getCertificate().getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
                 "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
@@ -108,7 +108,7 @@ public class BaseController {
 
 
         // Подпись данных для входа
-        byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
+        byte[] signedLogin = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
         String xmlResponse = gate.login(cDevice.armID, signedLogin);
         System.out.println(xmlResponse);

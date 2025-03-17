@@ -2,6 +2,7 @@ package ua.univer.controllers;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,7 @@ public class LoginController extends BaseController{
     }
 
 
+    @Scheduled(cron="* * 10 * * *")
     @GetMapping(value = "/v1/login", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<String> login() {
 
@@ -42,7 +44,7 @@ public class LoginController extends BaseController{
                 "<LoginMsg>" +
                 "<BrokSystem>Test</BrokSystem>" +
                 "<ArmID>" + cDevice.armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.certificate.getEncoded()) +"</Base64Cert>" +
+                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.getCertificate().getEncoded()) +"</Base64Cert>" +
                 "<Login>1</Login>" + // Логин
                 "<Pwd>1</Pwd>" + // Пароль
                 "<TokenMediaType>129</TokenMediaType>" + // Тип AES_GOST
@@ -51,7 +53,7 @@ public class LoginController extends BaseController{
                 "</LoginData>";
 
         // Подпись данных для входа
-        byte[] signedLogin = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
+        byte[] signedLogin = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
         String responseStr = gate.login(cDevice.armID, signedLogin);
         writeStringToFile(responseStr, "Response", ".xml");

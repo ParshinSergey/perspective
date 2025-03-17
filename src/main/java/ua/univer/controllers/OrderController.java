@@ -57,7 +57,7 @@ public class OrderController extends BaseController{
         String xmlString = ConverterUtil.objectToXML(document);
         writeStringToFile(xmlString, "NewOrder", ".xml");
 
-        byte[] signedXml = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
         byte[] crypt = genRSA.EncryptAES(signedXml, KeyStore.getFirst(), KeyStore.getSecond());
         byte[] response = gate.sendXMLResponse(cDevice.armID, crypt, ExchData.NewAddressOrder, false);
         byte[] decryptedResponse = genRSA.DecryptAES(response, KeyStore.getFirst(), KeyStore.getSecond());
@@ -97,7 +97,7 @@ public class OrderController extends BaseController{
         String xmlString = ConverterUtil.objectToXML(document);
         writeStringToFile(xmlString, "NewOrder", ".xml");
 
-        byte[] signedXml = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, xmlString.getBytes(StandardCharsets.UTF_8), true, avPath, err);
         byte[] crypt = BIT_PKCS11CL3.Encrypt(signedXml, KeyStore.sessionKey, err);
         byte[] response = gate.sendXMLResponse(cDevice.armID, crypt, ExchData.NewAddressOrder, false);
         byte[] decryptedResponse = BIT_PKCS11CL3.Decrypt(response, KeyStore.sessionKey, err);

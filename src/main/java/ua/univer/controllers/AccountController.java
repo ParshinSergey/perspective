@@ -44,7 +44,7 @@ public class AccountController extends BaseController{
         String xmlString = ConverterUtil.objectToXML(document);
         writeStringToFile(xmlString, "NewClient", ".xml");
 
-        byte[] signedXml = tokenLib.SignData(dev.certificate, dev.UsbSlot, pin, xmlString.getBytes(), true, avPath, err);
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, xmlString.getBytes(StandardCharsets.UTF_8), true, avPath, err);
         byte[] crypt = BIT_PKCS11CL3.Encrypt(signedXml, KeyStore.sessionKey, err);
         byte[] response = gate.sendXMLResponse(cDevice.armID, crypt, ExchData.AddNewClient, false);
         byte[] decryptedResponse = BIT_PKCS11CL3.Decrypt(response, KeyStore.sessionKey, err);
