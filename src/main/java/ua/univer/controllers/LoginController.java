@@ -33,7 +33,7 @@ public class LoginController extends BaseController{
     }
 
 
-    @Scheduled(cron="* * 10 * * *")
+    @Scheduled(cron="0 0 10 * * MON-FRI")
     @GetMapping(value = "/v1/login", produces = MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<String> login() {
 

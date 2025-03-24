@@ -13,6 +13,7 @@ import ua.univer.dto.FormNewClient;
 import ua.univer.dto.UtilForm;
 import ua.univer.exeptions.MyException;
 import ua.univer.BIT.CertGenerator;
+import ua.univer.exeptions.UnprocessableEntityException;
 import ua.univer.fbpgateclient.DocumentElement;
 import ua.univer.fbpgateclient.ExchData;
 import ua.univer.fbpgateclient.NewClient;
@@ -55,6 +56,35 @@ public class AccountController extends BaseController{
         DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
         if (de.getNewClients() == null) throw new MyException("Список NewClients пуст");
         NewClient result = de.getNewClients().get(0);
+
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(result));
+    }
+
+
+    @PostMapping(value = "/v2/createClient")
+    public ResponseEntity<String> createClientV2(@RequestBody @Valid FormNewClient form) {
+
+        logger.info("Method NewClientV2");
+        NewClient newClient = UtilForm.convertFormToNewClient(form);
+        DocumentElement document = new DocumentElement();
+        document.getNewClients().add(newClient);
+
+        String xmlString = ConverterUtil.objectToXML(document);
+        writeStringToFile(xmlString, "NewClient", ".xml");
+
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, xmlString.getBytes(StandardCharsets.UTF_8), true, avPath, err);
+        byte[] crypt = BIT_PKCS11CL3.Encrypt(signedXml, KeyStore.sessionKey, err);
+        byte[] response = gate.sendXMLResponse(cDevice.armID, crypt, ExchData.AddNewClient, false);
+        byte[] decryptedResponse = BIT_PKCS11CL3.Decrypt(response, KeyStore.sessionKey, err);
+
+        if(decryptedResponse == null) throw new MyException("Response is null");
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+        writeStringToFile(responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
+        if (de.getNewClients() == null) throw new MyException("Список NewClients пуст");
+        NewClient result = de.getNewClients().get(0);
+
+        if (result.getError() != null) throw new UnprocessableEntityException(result.getError());
 
         return ResponseEntity.ok().body(ConverterUtil.objectToJson(result));
     }

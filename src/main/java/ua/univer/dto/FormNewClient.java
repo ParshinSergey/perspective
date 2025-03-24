@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -24,24 +25,29 @@ public class FormNewClient {
     private Boolean isLegalEntity;
 
     @NotBlank
+    @Pattern(regexp = "^\\d{8}|\\d{10}$", message = "должно состоять из 8 или 10 цифр")
     private String inn;
 
+    @NotBlank
     private String edrpou;
 
     private String edrisi;
 
     private String countryCode;
 
+    @NotBlank
     private String passportDateOf;
 
+    @NotBlank
     private String passportIssuerOf;
 
+    @NotBlank
     private String passportNumOf;
 
+    @NotBlank
     private String passportSerOf;
 
     private String dateOfBirth;
-    //private XMLGregorianCalendar dateOfBirth;
 
     private String placeOfBirth;
 
