@@ -7,6 +7,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.tempuri.FBPGateProd;
 import org.tempuri.FBPGateService;
 import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
@@ -36,9 +37,22 @@ public class AppConfiguration {
     public final static String DIRECTORY = "INBOX_OUTBOX";
 
 
-    @Bean
-    public IFBPGateService getGate() {
+    @Bean(name="gateTest")
+    public IFBPGateService getGateTest() {
         FBPGateService service = new FBPGateService();
+        IFBPGateService gate = service.getWSHttpBindingFBPGate();
+
+        Map<String, Object> requestContext = ((BindingProvider)gate).getRequestContext();
+        requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 9000); // Timeout in millis
+        requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 2000); // Timeout in millis
+
+        return gate;
+    }
+
+
+    @Bean(name="gateProd")
+    public IFBPGateService getGateProd() {
+        FBPGateProd service = new FBPGateProd();
         IFBPGateService gate = service.getWSHttpBindingFBPGate();
 
         Map<String, Object> requestContext = ((BindingProvider)gate).getRequestContext();

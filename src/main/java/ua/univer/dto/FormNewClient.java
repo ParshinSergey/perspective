@@ -1,6 +1,5 @@
 package ua.univer.dto;
 
-//import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +7,6 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 @Getter
 @Setter
@@ -44,7 +42,6 @@ public class FormNewClient {
     @NotBlank
     private String passportNumOf;
 
-    @NotBlank
     private String passportSerOf;
 
     private String dateOfBirth;
@@ -65,22 +62,28 @@ public class FormNewClient {
     private String addrFMAREACODE;
 
     @Size(max = 256)
-    protected String addrDISTRICT;
+    private String addrDISTRICT;
 
-    protected String addrCITY;
-    protected String addrZIP;
-    protected String addrSTREET;
-    protected String addrBUILDING;
-    protected String addrHOUSE;
-    protected String addrOFFICE;
-    protected String fmSTATEREGNO;
-    protected XMLGregorianCalendar fmSTATEREGDT;
-    protected String fmSTATEREGAUTH;
-    protected String fmSTATEREGNOBASED;
-    protected Boolean isAllowNBU;
-    protected Boolean isAllowNDU;
-    protected String error;
-    protected String gateData;
+    private String addrCITY;
+    private String addrZIP;
+    private String addrSTREET;
+    private String addrBUILDING;
+    private String addrHOUSE;
+    private String addrOFFICE;
+
+/*
+    эти поля для Юрлиц
+    private String fmSTATEREGNO;
+    private XMLGregorianCalendar fmSTATEREGDT;
+    private String fmSTATEREGAUTH;
+    private String fmSTATEREGNOBASED;
+
+*/
+
+    private Boolean isAllowNBU;
+    private Boolean isAllowNDU;
+    private String error;
+    private String gateData;
 
 
 }

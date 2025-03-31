@@ -10,6 +10,7 @@ import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
 import ua.avtor.DsLib.CertificateException;
 import ua.univer.BIT.*;
+import ua.univer.exeptions.MyException;
 import ua.univer.fbpgateclient.*;
 import ua.univer.util.ConverterUtil;
 
@@ -30,17 +31,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 
+import static ua.univer.util.FileUtil.writeStringToFile;
+
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class BaseController {
 
-    public static final String FBP_URL = "http://77.88.202.130:4000/FBPGate.IFBPGateService";
-
     Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     protected final HttpClient httpClient;
-    protected final IFBPGateService gate;
+    protected final IFBPGateService gateTest;
+    protected final IFBPGateService gateProd;
     protected final CertGenerator genRSA;
     protected final cDevice dev;
     protected final KeyStore keyStore;
@@ -51,9 +53,10 @@ public class BaseController {
     protected String pin = "12345678";
 
 
-    public BaseController(HttpClient httpClient, IFBPGateService gate, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
+    public BaseController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateService gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         this.httpClient = httpClient;
-        this.gate = gate;
+        this.gateTest = gateTest;
+        this.gateProd = gateProd;
         this.genRSA = genRSA;
         this.dev = dev;
         this.keyStore = keyStore;
@@ -61,79 +64,49 @@ public class BaseController {
 
 
 
+    protected String loginProdBase() {
 
-    @GetMapping(value = "/v2/login", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<String> login() throws JAXBException {
+        logger.info("Method Login from Base Class");
 
-        // Библиотека подпись/шифрование/дешифрование/сессионный ключ
-        /*BIT_PKCS11CL3 tokenLib = new BIT_PKCS11CL3();
-        String strError = "";
-        Holder<String> err = new Holder<>(strError);*/
-
-        // Аппаратные ключи - BIT_PKCS11CL3.Av337PathChip
-        // Программные ключи
-        //String avPath = BIT_PKCS11CL3.Av337PathProg;
-     /*   ArrayList<cDevice> devices = tokenLib.GetDeviceList(true, avPath, err);
-
-        // Первое устройство
-        dev = devices.get(0);
-
-        // Список сертификатов устройства
-        ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
-
-        // Последний сертификат из списка
-        certificate = certificates.get(certificates.size() - 1);
-
-    *//*    String pin = "12345678";*/
-
-        // Проверка пина
-        if (!tokenLib.CheckPin(dev.UsbSlot, avPath, pin))
-            return ResponseEntity.badRequest().body("Ошибка проверки ПИНа");
-
-       /* // Рабочее место из сертификата
-        armID = dev.certificate.getSubjectName("OU");*/
-
-        // XML для входа
-        String strLoginData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<LoginData>" +
-                "<LoginMsg>" +
-                "<BrokSystem>Test</BrokSystem>" +
-                "<ArmID>" + cDevice.armID + "</ArmID>" +
-                "<Base64Cert>" + Base64.getEncoder().encodeToString(dev.getCertificate().getEncoded()) +"</Base64Cert>" +
-                "<Login>1</Login>" + // Логин
-                "<Pwd>1</Pwd>" + // Пароль
-                "<RSAEncCert>" + Base64.getEncoder().encodeToString(CertGenerator.RSACert) + "</RSAEncCert>" +
-                "</LoginMsg>" +
-                "</LoginData>";
-
-
-        // Подпись данных для входа
+        String strLoginData = loginXML(cDevice.armID, Base64.getEncoder().encodeToString(dev.getCertificate().getEncoded()),
+                KeyStore.login, KeyStore.password, Base64.getEncoder().encodeToString(CertGenerator.RSACert));
         byte[] signedLogin = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, strLoginData.getBytes(), true, avPath, err);
 
-        String xmlResponse = gate.login(cDevice.armID, signedLogin);
-        System.out.println(xmlResponse);
-
-        // Парсим ответ xml
-        JAXBContext jaxbContextLogin = JAXBContext.newInstance(LoginData.class);
-        Unmarshaller unmarshaller = jaxbContextLogin.createUnmarshaller();
-        LoginData loginData = (LoginData) unmarshaller.unmarshal(new StringReader(xmlResponse));
-
+        String responseStr = gateProd.login(cDevice.armID, signedLogin);
+        writeStringToFile(responseStr, "Response", ".xml");
+        LoginData loginData = ConverterUtil.xmlToObject(responseStr, LoginData.class);
         if (loginData.login == null || loginData.login.isEmpty() || loginData.login.get(0).IsLoginOk == null || !loginData.login.get(0).IsLoginOk.equalsIgnoreCase("True")) {
-            logger.warn(" Логина нет, или там пусто");
-            return ResponseEntity.ok(xmlResponse);
+            logger.error("CAN NOT CONNECT TO FBP");
+            return "Вхід на ФБ Перспектива не виконано !!";
         }
+        KeyStore.sessionKeyProd = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
 
-        // Генерируем ключ симметричного шифрования ДСТУ
-        KeyStore.sessionKey = genRSA.GenerateSessionKeyB(Base64.getDecoder().decode(loginData.login.get(0).Base64Token));
-
-
-        return ResponseEntity.ok().body(xmlResponse);
+        return "Вхід до Системи виконано. Спробуйте ще раз.";
     }
 
 
 
+    protected String loginXML(String armID, String cert, String login, String password, String rsaCert){
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<LoginData>" +
+                "<LoginMsg>" +
+                "<BrokSystem>Test</BrokSystem>" +
+                "<ArmID>" + armID + "</ArmID>" +
+                "<Base64Cert>" + cert + "</Base64Cert>" +
+                "<Login>" + login + "</Login>" +
+                "<Pwd>" + password + "</Pwd>" +
+                "<TokenMediaType>129</TokenMediaType>" +
+                "<RSAEncCert>" + rsaCert + "</RSAEncCert>" +
+                "</LoginMsg>" +
+                "</LoginData>";
+    }
 
-    @GetMapping(value = "/v1/loginT", consumes = MediaType.ALL_VALUE)
+
+
+/*
+
+
+    @GetMapping(value = "/test/loginT", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> loginT() throws CertificateException, JAXBException, IllegalAccessException, InvocationTargetException {
 
         System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump","true");
@@ -182,7 +155,6 @@ public class BaseController {
         logger.info("_____________________________________");
 
 
-       // Object someObject = getItSomehow();
         for (Field field : cer.getClass().getDeclaredFields()) {
             field.setAccessible(true); // You might want to set modifier to public first.
             Object value = field.get(cer);
@@ -252,9 +224,11 @@ public class BaseController {
             return ResponseEntity.ok(xmlResponse);
         }
 
-
         return ResponseEntity.ok().body(xmlResponse);
     }
+
+*/
+
 
 
     @GetMapping(value = "/v1/crypt", consumes = MediaType.ALL_VALUE, produces = MediaType.ALL_VALUE)
