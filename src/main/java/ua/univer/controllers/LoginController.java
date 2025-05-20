@@ -116,5 +116,45 @@ public class LoginController extends BaseController{
     }
 
 
+    @GetMapping(value = "/prod/authorizationCheck", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> authorizationCheck() {
+
+        logger.info("Method AuthorizationCheck.");
+
+        String abc = "Проверка авторизации и шифрования";
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, abc.getBytes(), true, avPath, err);
+        byte[] crypt = BIT_PKCS11CL3.Encrypt(signedXml, KeyStore.sessionKeyProd, err);
+        Integer response = gateProd.sendXML(cDevice.armID, crypt, ExchData.AuthorizationCheck);
+
+        String result;
+        switch (response){
+            case 1:
+                result = "Авторизация выполнена";
+                break;
+            case 0:
+                result = "Ошибки с шифрованием или подписью";
+                break;
+            case -1:
+                result = "Служба отстутствует в списке подключений";
+                break;
+            default:
+                result = "Неизвестная ошибка";
+                break;
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
+
+
+    @GetMapping(value = "/prod/getLastError", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getLastError() {
+
+        logger.info("getLastError.");
+        String result = gateProd.getLastError(cDevice.armID);
+
+        return ResponseEntity.ok().body(result);
+    }
+
+
 
 }

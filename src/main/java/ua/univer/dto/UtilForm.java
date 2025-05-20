@@ -1,6 +1,8 @@
 package ua.univer.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import ua.univer.BIT.cDevice;
+import ua.univer.exeptions.UnprocessableEntityException;
 import ua.univer.fbpgateclient.AddressOrder;
 import ua.univer.fbpgateclient.NewClient;
 
@@ -8,7 +10,7 @@ import static ua.univer.util.DateTimeUtil.*;
 
 import java.time.LocalDateTime;
 
-
+@Slf4j
 public class UtilForm {
 
     public UtilForm() {
@@ -37,17 +39,37 @@ public class UtilForm {
         client.setAccountTypeNDU(form.getAccountTypeNDU());
         client.setAccNoInNDU(form.getAccNoInNDU().length() == 17 ? form.getAccNoInNDU().substring(7) : form.getAccNoInNDU());
         client.setAddrFMAREACODE(form.getAddrFMAREACODE());
-        // client.setAddrDISTRICT(form.getAddrDISTRICT());
-        client.setAddrSTREET(form.getAddrSTREET());
 
-        String phrase = "фактична адреса проживання";
-        String[] arrAddress = form.getAddrDISTRICT().split(phrase, 2);
-        client.setAddrDISTRICT(arrAddress[0].trim());
-        if (arrAddress.length > 1) {
-            client.setAddrSTREET(phrase + " " + arrAddress[1].trim());
-        }
+        setCorrectAddress(form, client);
 
         return client;
+    }
+
+
+    private static void setCorrectAddress(FormNewClient form, NewClient client) {
+
+        String phrase1 = "фактична адреса проживання";
+        String phrase2 = "ВПО№";
+        String district = form.getAddrDISTRICT();
+        String street = form.getAddrSTREET();
+
+        if (district.matches("(.*)" + phrase1 + "(.*)")) {
+            String[] arrAddress = form.getAddrDISTRICT().split(phrase1, 2);
+            district = arrAddress[0].trim();
+            street = arrAddress.length > 1 ? phrase1 + " " + arrAddress[1].trim() : null;
+        }
+        else if (district.matches("(.*)" + phrase2 + "(.*)")){
+            String[] arrAddress = form.getAddrDISTRICT().split(phrase2, 2);
+            district = arrAddress[0].trim();
+            street = arrAddress.length > 1 ? phrase2 + " " + arrAddress[1].trim() : null;
+        }
+
+        if (district.length() > 200) {
+            log.warn(district);
+            throw new UnprocessableEntityException("адреса має бути не більше 200 символів");
+        }
+        client.setAddrDISTRICT(district);
+        client.setAddrSTREET(street);
     }
 
 
