@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 @Slf4j
 public class UtilForm {
 
+    private final static String PHRASE1 = "фактична адреса проживання";
+    private final static String PHRASE2 = "ВПО№";
+    private final static String PHRASE3 = "фактична:";
+
     public UtilForm() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
@@ -48,20 +52,26 @@ public class UtilForm {
 
     private static void setCorrectAddress(FormNewClient form, NewClient client) {
 
-        String phrase1 = "фактична адреса проживання";
-        String phrase2 = "ВПО№";
+        //String phrase1 = "фактична адреса проживання";
+        //String phrase2 = "ВПО№";
+        //String phrase3 = "фактична:";
         String district = form.getAddrDISTRICT();
         String street = form.getAddrSTREET();
 
-        if (district.matches("(.*)" + phrase1 + "(.*)")) {
-            String[] arrAddress = form.getAddrDISTRICT().split(phrase1, 2);
+        if (district.matches("(.*)" + PHRASE1 + "(.*)")) {
+            String[] arrAddress = form.getAddrDISTRICT().split(PHRASE1, 2);
             district = arrAddress[0].trim();
-            street = arrAddress.length > 1 ? phrase1 + " " + arrAddress[1].trim() : null;
+            street = arrAddress.length > 1 ? PHRASE1 + " " + arrAddress[1].trim() : null;
         }
-        else if (district.matches("(.*)" + phrase2 + "(.*)")){
-            String[] arrAddress = form.getAddrDISTRICT().split(phrase2, 2);
+        else if (district.matches("(.*)" + PHRASE2 + "(.*)")){
+            String[] arrAddress = form.getAddrDISTRICT().split(PHRASE2, 2);
             district = arrAddress[0].trim();
-            street = arrAddress.length > 1 ? phrase2 + " " + arrAddress[1].trim() : null;
+            street = arrAddress.length > 1 ? PHRASE2 + " " + arrAddress[1].trim() : null;
+        }
+        else if (district.matches("(.*)" + PHRASE3 + "(.*)")){
+            String[] arrAddress = form.getAddrDISTRICT().split(PHRASE3, 2);
+            district = arrAddress[0].trim();
+            street = arrAddress.length > 1 ? PHRASE3 + " " + arrAddress[1].trim() : null;
         }
 
         if (district.length() > 200) {

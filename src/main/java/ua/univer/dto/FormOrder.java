@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 @Getter
@@ -11,6 +12,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @NoArgsConstructor
 public class FormOrder {
 
+    @NotNull
     private Integer applicationID;
     private Integer crossApplicationID;
     private Integer mainAppID;
@@ -64,6 +66,7 @@ public class FormOrder {
     private XMLGregorianCalendar isRemoval;
     private XMLGregorianCalendar isRejected;
     private String discription;
+    @NotNull
     private String applicationContext;
     private String payAccountPaper2;
     private String clientEdrpou2;

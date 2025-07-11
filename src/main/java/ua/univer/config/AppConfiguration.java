@@ -5,6 +5,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tempuri.FBPGateProd;
@@ -26,12 +27,16 @@ import java.io.File;
 import java.net.http.HttpClient;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
+import java.time.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
 @Configuration
+@Slf4j
 public class AppConfiguration {
 
     public final static String DIRECTORY = "INBOX_OUTBOX";
@@ -82,6 +87,19 @@ public class AppConfiguration {
         ArrayList<Certificate> certificates = tokenLib.GetCertificateList(dev.UsbSlot, avPath, err);
         dev.setCertificate(certificates.get(certificates.size() - 1));
         cDevice.armID = dev.getCertificate().getSubjectName("OU");
+
+        Certificate cer = certificates.get(certificates.size() - 1);
+        log.info("_____________________________________");
+        log.info("Certificate Name " + cer.getSubjectName("OU"));
+        log.info("EMail " + cer.getEMail());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dd1 = Instant.ofEpochMilli(cer.getNotBefore()).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dd2 = Instant.ofEpochMilli(cer.getNotAfter()).atZone(ZoneId.systemDefault()).toLocalDate();
+        log.info("NotBefore " + dd1.format(dateTimeFormatter));
+        log.info("NotAfter " + dd2.format(dateTimeFormatter));
+        log.info("_____________________________________");
+
+
 
         return dev;
     }
