@@ -26,24 +26,42 @@ import com.fbpgate.ArrayOfMassXMLDataType;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _SendXMLSignedData_QNAME = new QName("http://tempuri.org/", "SignedData");
-    private final static QName _SendXMLStrArmID_QNAME = new QName("http://tempuri.org/", "strArmID");
+    private final static QName _GetCryptXMLContractsStrArmID_QNAME = new QName("http://tempuri.org/", "strArmID");
+    private final static QName _GetCryptXMLContextResponseGetCryptXMLContextResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLContextResult");
+    private final static QName _GetCryptXMLResponseGetCryptXMLResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLResult");
+    private final static QName _GetCryptXMLContextApplicationContext_QNAME = new QName("http://tempuri.org/", "ApplicationContext");
+    private final static QName _SendMassXMLXMLData_QNAME = new QName("http://tempuri.org/", "XMLData");
+    private final static QName _SendXMLResponse2SignedData_QNAME = new QName("http://tempuri.org/", "SignedData");
+    private final static QName _GetServerCertificateResponseGetServerCertificateResult_QNAME = new QName("http://tempuri.org/", "GetServerCertificateResult");
     private final static QName _LogoutRawSignData_QNAME = new QName("http://tempuri.org/", "rawSignData");
     private final static QName _SendXMLResponseResponseSendXMLResponseResult_QNAME = new QName("http://tempuri.org/", "SendXML_ResponseResult");
-    private final static QName _GetLastErrorResponseGetLastErrorResult_QNAME = new QName("http://tempuri.org/", "GetLastErrorResult");
-    private final static QName _SendMassXMLXMLData_QNAME = new QName("http://tempuri.org/", "XMLData");
-    private final static QName _GetServerCertificateResponseGetServerCertificateResult_QNAME = new QName("http://tempuri.org/", "GetServerCertificateResult");
-    private final static QName _GetCryptXMLContextResponseGetCryptXMLContextResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLContextResult");
     private final static QName _LoginResponseLoginResult_QNAME = new QName("http://tempuri.org/", "LoginResult");
-    private final static QName _GetCryptXMLResponseGetCryptXMLResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLResult");
+    private final static QName _GetCryptXMLByJournalIDResponseGetCryptXMLByJournalIDResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLByJournalIDResult");
+    private final static QName _GetLastErrorResponseGetLastErrorResult_QNAME = new QName("http://tempuri.org/", "GetLastErrorResult");
+    private final static QName _GetCryptXMLContractsResponseGetCryptXMLContractsResult_QNAME = new QName("http://tempuri.org/", "GetCryptXMLContractsResult");
     private final static QName _GetXMLResponseGetXMLResult_QNAME = new QName("http://tempuri.org/", "GetXMLResult");
-    private final static QName _GetCryptXMLContextApplicationContext_QNAME = new QName("http://tempuri.org/", "ApplicationContext");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.tempuri
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link GetCryptXMLContracts }
+     * 
+     */
+    public GetCryptXMLContracts createGetCryptXMLContracts() {
+        return new GetCryptXMLContracts();
+    }
+
+    /**
+     * Create an instance of {@link GetCryptXMLContractsResponse }
+     * 
+     */
+    public GetCryptXMLContractsResponse createGetCryptXMLContractsResponse() {
+        return new GetCryptXMLContractsResponse();
     }
 
     /**
@@ -87,6 +105,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link GetCryptXMLByJournalID }
+     * 
+     */
+    public GetCryptXMLByJournalID createGetCryptXMLByJournalID() {
+        return new GetCryptXMLByJournalID();
+    }
+
+    /**
      * Create an instance of {@link GetCryptXMLChangesLimitedResponse }
      * 
      */
@@ -100,6 +126,14 @@ public class ObjectFactory {
      */
     public SendMassXMLResponse createSendMassXMLResponse() {
         return new SendMassXMLResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetCryptXMLByJournalIDResponse }
+     * 
+     */
+    public GetCryptXMLByJournalIDResponse createGetCryptXMLByJournalIDResponse() {
+        return new GetCryptXMLByJournalIDResponse();
     }
 
     /**
@@ -311,120 +345,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SignedData", scope = SendXML.class)
-    public JAXBElement<byte[]> createSendXMLSignedData(byte[] value) {
-        return new JAXBElement<byte[]>(_SendXMLSignedData_QNAME, byte[].class, SendXML.class, ((byte[]) value));
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendXML.class)
-    public JAXBElement<String> createSendXMLStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, SendXML.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "rawSignData", scope = Logout.class)
-    public JAXBElement<byte[]> createLogoutRawSignData(byte[] value) {
-        return new JAXBElement<byte[]>(_LogoutRawSignData_QNAME, byte[].class, Logout.class, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = Logout.class)
-    public JAXBElement<String> createLogoutStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, Logout.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetLastError.class)
-    public JAXBElement<String> createGetLastErrorStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetLastError.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SendXML_ResponseResult", scope = SendXMLResponseResponse.class)
-    public JAXBElement<byte[]> createSendXMLResponseResponseSendXMLResponseResult(byte[] value) {
-        return new JAXBElement<byte[]>(_SendXMLResponseResponseSendXMLResponseResult_QNAME, byte[].class, SendXMLResponseResponse.class, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetLastErrorResult", scope = GetLastErrorResponse.class)
-    public JAXBElement<String> createGetLastErrorResponseGetLastErrorResult(String value) {
-        return new JAXBElement<String>(_GetLastErrorResponseGetLastErrorResult_QNAME, String.class, GetLastErrorResponse.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLChangesLimited.class)
-    public JAXBElement<String> createGetCryptXMLChangesLimitedStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetCryptXMLChangesLimited.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "rawSignData", scope = Login.class)
-    public JAXBElement<byte[]> createLoginRawSignData(byte[] value) {
-        return new JAXBElement<byte[]>(_LogoutRawSignData_QNAME, byte[].class, Login.class, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = Login.class)
-    public JAXBElement<String> createLoginStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, Login.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ArrayOfMassXMLDataType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "XMLData", scope = SendMassXML.class)
-    public JAXBElement<ArrayOfMassXMLDataType> createSendMassXMLXMLData(ArrayOfMassXMLDataType value) {
-        return new JAXBElement<ArrayOfMassXMLDataType>(_SendMassXMLXMLData_QNAME, ArrayOfMassXMLDataType.class, SendMassXML.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendMassXML.class)
-    public JAXBElement<String> createSendMassXMLStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, SendMassXML.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetServerCertificateResult", scope = GetServerCertificateResponse.class)
-    public JAXBElement<byte[]> createGetServerCertificateResponseGetServerCertificateResult(byte[] value) {
-        return new JAXBElement<byte[]>(_GetServerCertificateResponseGetServerCertificateResult_QNAME, byte[].class, GetServerCertificateResponse.class, ((byte[]) value));
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLContracts.class)
+    public JAXBElement<String> createGetCryptXMLContractsStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXMLContracts.class, value);
     }
 
     /**
@@ -434,51 +360,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetCryptXMLContextResult", scope = GetCryptXMLContextResponse.class)
     public JAXBElement<byte[]> createGetCryptXMLContextResponseGetCryptXMLContextResult(byte[] value) {
         return new JAXBElement<byte[]>(_GetCryptXMLContextResponseGetCryptXMLContextResult_QNAME, byte[].class, GetCryptXMLContextResponse.class, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "LoginResult", scope = LoginResponse.class)
-    public JAXBElement<String> createLoginResponseLoginResult(String value) {
-        return new JAXBElement<String>(_LoginResponseLoginResult_QNAME, String.class, LoginResponse.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetNewAddressOrderRequestInProcessCnt.class)
-    public JAXBElement<String> createGetNewAddressOrderRequestInProcessCntStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetNewAddressOrderRequestInProcessCnt.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLChanges.class)
-    public JAXBElement<String> createGetCryptXMLChangesStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetCryptXMLChanges.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SignedData", scope = SendXMLResponse2 .class)
-    public JAXBElement<byte[]> createSendXMLResponse2SignedData(byte[] value) {
-        return new JAXBElement<byte[]>(_SendXMLSignedData_QNAME, byte[].class, SendXMLResponse2 .class, ((byte[]) value));
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendXMLResponse2 .class)
-    public JAXBElement<String> createSendXMLResponse2StrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, SendXMLResponse2 .class, value);
     }
 
     /**
@@ -494,9 +375,9 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetXMLResult", scope = GetXMLResponse.class)
-    public JAXBElement<String> createGetXMLResponseGetXMLResult(String value) {
-        return new JAXBElement<String>(_GetXMLResponseGetXMLResult_QNAME, String.class, GetXMLResponse.class, value);
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetLastError.class)
+    public JAXBElement<String> createGetLastErrorStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetLastError.class, value);
     }
 
     /**
@@ -514,7 +395,52 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLContext.class)
     public JAXBElement<String> createGetCryptXMLContextStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetCryptXMLContext.class, value);
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXMLContext.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ArrayOfMassXMLDataType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "XMLData", scope = SendMassXML.class)
+    public JAXBElement<ArrayOfMassXMLDataType> createSendMassXMLXMLData(ArrayOfMassXMLDataType value) {
+        return new JAXBElement<ArrayOfMassXMLDataType>(_SendMassXMLXMLData_QNAME, ArrayOfMassXMLDataType.class, SendMassXML.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendMassXML.class)
+    public JAXBElement<String> createSendMassXMLStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, SendMassXML.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SignedData", scope = SendXMLResponse2 .class)
+    public JAXBElement<byte[]> createSendXMLResponse2SignedData(byte[] value) {
+        return new JAXBElement<byte[]>(_SendXMLResponse2SignedData_QNAME, byte[].class, SendXMLResponse2 .class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendXMLResponse2 .class)
+    public JAXBElement<String> createSendXMLResponse2StrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, SendXMLResponse2 .class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLChanges.class)
+    public JAXBElement<String> createGetCryptXMLChangesStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXMLChanges.class, value);
     }
 
     /**
@@ -523,7 +449,151 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXML.class)
     public JAXBElement<String> createGetCryptXMLStrArmID(String value) {
-        return new JAXBElement<String>(_SendXMLStrArmID_QNAME, String.class, GetCryptXML.class, value);
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXML.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetServerCertificateResult", scope = GetServerCertificateResponse.class)
+    public JAXBElement<byte[]> createGetServerCertificateResponseGetServerCertificateResult(byte[] value) {
+        return new JAXBElement<byte[]>(_GetServerCertificateResponseGetServerCertificateResult_QNAME, byte[].class, GetServerCertificateResponse.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "rawSignData", scope = Logout.class)
+    public JAXBElement<byte[]> createLogoutRawSignData(byte[] value) {
+        return new JAXBElement<byte[]>(_LogoutRawSignData_QNAME, byte[].class, Logout.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = Logout.class)
+    public JAXBElement<String> createLogoutStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, Logout.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLChangesLimited.class)
+    public JAXBElement<String> createGetCryptXMLChangesLimitedStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXMLChangesLimited.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SendXML_ResponseResult", scope = SendXMLResponseResponse.class)
+    public JAXBElement<byte[]> createSendXMLResponseResponseSendXMLResponseResult(byte[] value) {
+        return new JAXBElement<byte[]>(_SendXMLResponseResponseSendXMLResponseResult_QNAME, byte[].class, SendXMLResponseResponse.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetCryptXMLByJournalID.class)
+    public JAXBElement<String> createGetCryptXMLByJournalIDStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetCryptXMLByJournalID.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "SignedData", scope = SendXML.class)
+    public JAXBElement<byte[]> createSendXMLSignedData(byte[] value) {
+        return new JAXBElement<byte[]>(_SendXMLResponse2SignedData_QNAME, byte[].class, SendXML.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = SendXML.class)
+    public JAXBElement<String> createSendXMLStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, SendXML.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "LoginResult", scope = LoginResponse.class)
+    public JAXBElement<String> createLoginResponseLoginResult(String value) {
+        return new JAXBElement<String>(_LoginResponseLoginResult_QNAME, String.class, LoginResponse.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetCryptXMLByJournalIDResult", scope = GetCryptXMLByJournalIDResponse.class)
+    public JAXBElement<byte[]> createGetCryptXMLByJournalIDResponseGetCryptXMLByJournalIDResult(byte[] value) {
+        return new JAXBElement<byte[]>(_GetCryptXMLByJournalIDResponseGetCryptXMLByJournalIDResult_QNAME, byte[].class, GetCryptXMLByJournalIDResponse.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = GetNewAddressOrderRequestInProcessCnt.class)
+    public JAXBElement<String> createGetNewAddressOrderRequestInProcessCntStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, GetNewAddressOrderRequestInProcessCnt.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetLastErrorResult", scope = GetLastErrorResponse.class)
+    public JAXBElement<String> createGetLastErrorResponseGetLastErrorResult(String value) {
+        return new JAXBElement<String>(_GetLastErrorResponseGetLastErrorResult_QNAME, String.class, GetLastErrorResponse.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetCryptXMLContractsResult", scope = GetCryptXMLContractsResponse.class)
+    public JAXBElement<byte[]> createGetCryptXMLContractsResponseGetCryptXMLContractsResult(byte[] value) {
+        return new JAXBElement<byte[]>(_GetCryptXMLContractsResponseGetCryptXMLContractsResult_QNAME, byte[].class, GetCryptXMLContractsResponse.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "rawSignData", scope = Login.class)
+    public JAXBElement<byte[]> createLoginRawSignData(byte[] value) {
+        return new JAXBElement<byte[]>(_LogoutRawSignData_QNAME, byte[].class, Login.class, ((byte[]) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "strArmID", scope = Login.class)
+    public JAXBElement<String> createLoginStrArmID(String value) {
+        return new JAXBElement<String>(_GetCryptXMLContractsStrArmID_QNAME, String.class, Login.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://tempuri.org/", name = "GetXMLResult", scope = GetXMLResponse.class)
+    public JAXBElement<String> createGetXMLResponseGetXMLResult(String value) {
+        return new JAXBElement<String>(_GetXMLResponseGetXMLResult_QNAME, String.class, GetXMLResponse.class, value);
     }
 
 }

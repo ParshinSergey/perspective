@@ -7,6 +7,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 import com.arrays.ArrayOfstring;
@@ -206,6 +207,55 @@ public interface IFBPGateService {
         Long nLimit,
         @WebParam(name = "WithShema", targetNamespace = "http://tempuri.org/")
         Boolean withShema);
+
+    /**
+     * 
+     * @param isCurrent
+     * @param onDate
+     * @param nData
+     * @param withShema
+     * @param strArmID
+     * @return
+     *     returns byte[]
+     */
+    @WebMethod(operationName = "GetCryptXMLContracts", action = "http://tempuri.org/IFBPGateService/GetCryptXMLContracts")
+    @WebResult(name = "GetCryptXMLContractsResult", targetNamespace = "http://tempuri.org/")
+    @RequestWrapper(localName = "GetCryptXMLContracts", targetNamespace = "http://tempuri.org/", className = "com.tempuri.GetCryptXMLContracts")
+    @ResponseWrapper(localName = "GetCryptXMLContractsResponse", targetNamespace = "http://tempuri.org/", className = "com.tempuri.GetCryptXMLContractsResponse")
+    public byte[] getCryptXMLContracts(
+        @WebParam(name = "strArmID", targetNamespace = "http://tempuri.org/")
+        String strArmID,
+        @WebParam(name = "nData", targetNamespace = "http://tempuri.org/")
+        Integer nData,
+        @WebParam(name = "WithShema", targetNamespace = "http://tempuri.org/")
+        Boolean withShema,
+        @WebParam(name = "OnDate", targetNamespace = "http://tempuri.org/")
+        XMLGregorianCalendar onDate,
+        @WebParam(name = "IsCurrent", targetNamespace = "http://tempuri.org/")
+        Boolean isCurrent);
+
+    /**
+     * 
+     * @param nData
+     * @param withShema
+     * @param journalID
+     * @param strArmID
+     * @return
+     *     returns byte[]
+     */
+    @WebMethod(operationName = "GetCryptXMLByJournalID", action = "http://tempuri.org/IFBPGateService/GetCryptXMLByJournalID")
+    @WebResult(name = "GetCryptXMLByJournalIDResult", targetNamespace = "http://tempuri.org/")
+    @RequestWrapper(localName = "GetCryptXMLByJournalID", targetNamespace = "http://tempuri.org/", className = "com.tempuri.GetCryptXMLByJournalID")
+    @ResponseWrapper(localName = "GetCryptXMLByJournalIDResponse", targetNamespace = "http://tempuri.org/", className = "com.tempuri.GetCryptXMLByJournalIDResponse")
+    public byte[] getCryptXMLByJournalID(
+        @WebParam(name = "strArmID", targetNamespace = "http://tempuri.org/")
+        String strArmID,
+        @WebParam(name = "nData", targetNamespace = "http://tempuri.org/")
+        Integer nData,
+        @WebParam(name = "WithShema", targetNamespace = "http://tempuri.org/")
+        Boolean withShema,
+        @WebParam(name = "JournalID", targetNamespace = "http://tempuri.org/")
+        Long journalID);
 
     /**
      * 

@@ -33,13 +33,13 @@ public class ObjectFactory {
     private final static QName _ArrayOfMassXMLData_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "ArrayOfMassXMLData");
     private final static QName _ArrayOfGateDataRequest_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "ArrayOfGateDataRequest");
     private final static QName _GateDataRequest_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "GateDataRequest");
-    private final static QName _DataResponseTypeLastErrors_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "LastErrors");
-    private final static QName _DataResponseTypeGateDataResponseList_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "GateDataResponseList");
+    private final static QName _MassXMLDataTypeSignedData_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "SignedData");
+    private final static QName _GateDataResponseTypeLastErrors_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "LastErrors");
     private final static QName _GateDataResponseTypeXMLData_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "XMLData");
     private final static QName _GateDataResponseTypeEncryptedData_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "EncryptedData");
     private final static QName _DataRequestTypeStrArmID_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "strArmID");
     private final static QName _DataRequestTypeGateDataRequestList_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "GateDataRequestList");
-    private final static QName _MassXMLDataTypeSignedData_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "SignedData");
+    private final static QName _DataResponseTypeGateDataResponseList_QNAME = new QName("http://schemas.datacontract.org/2004/07/FBPGate", "GateDataResponseList");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.fbpgate
@@ -202,21 +202,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "LastErrors", scope = DataResponseType.class)
-    public JAXBElement<String> createDataResponseTypeLastErrors(String value) {
-        return new JAXBElement<String>(_DataResponseTypeLastErrors_QNAME, String.class, DataResponseType.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ArrayOfGateDataResponseType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "GateDataResponseList", scope = DataResponseType.class)
-    public JAXBElement<ArrayOfGateDataResponseType> createDataResponseTypeGateDataResponseList(ArrayOfGateDataResponseType value) {
-        return new JAXBElement<ArrayOfGateDataResponseType>(_DataResponseTypeGateDataResponseList_QNAME, ArrayOfGateDataResponseType.class, DataResponseType.class, value);
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "SignedData", scope = MassXMLDataType.class)
+    public JAXBElement<byte[]> createMassXMLDataTypeSignedData(byte[] value) {
+        return new JAXBElement<byte[]>(_MassXMLDataTypeSignedData_QNAME, byte[].class, MassXMLDataType.class, ((byte[]) value));
     }
 
     /**
@@ -225,7 +216,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "LastErrors", scope = GateDataResponseType.class)
     public JAXBElement<String> createGateDataResponseTypeLastErrors(String value) {
-        return new JAXBElement<String>(_DataResponseTypeLastErrors_QNAME, String.class, GateDataResponseType.class, value);
+        return new JAXBElement<String>(_GateDataResponseTypeLastErrors_QNAME, String.class, GateDataResponseType.class, value);
     }
 
     /**
@@ -247,6 +238,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "EncryptedData", scope = DataChangesType.class)
+    public JAXBElement<byte[]> createDataChangesTypeEncryptedData(byte[] value) {
+        return new JAXBElement<byte[]>(_GateDataResponseTypeEncryptedData_QNAME, byte[].class, DataChangesType.class, ((byte[]) value));
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -265,21 +265,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "SignedData", scope = MassXMLDataType.class)
-    public JAXBElement<byte[]> createMassXMLDataTypeSignedData(byte[] value) {
-        return new JAXBElement<byte[]>(_MassXMLDataTypeSignedData_QNAME, byte[].class, MassXMLDataType.class, ((byte[]) value));
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "LastErrors", scope = DataResponseType.class)
+    public JAXBElement<String> createDataResponseTypeLastErrors(String value) {
+        return new JAXBElement<String>(_GateDataResponseTypeLastErrors_QNAME, String.class, DataResponseType.class, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ArrayOfGateDataResponseType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "EncryptedData", scope = DataChangesType.class)
-    public JAXBElement<byte[]> createDataChangesTypeEncryptedData(byte[] value) {
-        return new JAXBElement<byte[]>(_GateDataResponseTypeEncryptedData_QNAME, byte[].class, DataChangesType.class, ((byte[]) value));
+    @XmlElementDecl(namespace = "http://schemas.datacontract.org/2004/07/FBPGate", name = "GateDataResponseList", scope = DataResponseType.class)
+    public JAXBElement<ArrayOfGateDataResponseType> createDataResponseTypeGateDataResponseList(ArrayOfGateDataResponseType value) {
+        return new JAXBElement<ArrayOfGateDataResponseType>(_DataResponseTypeGateDataResponseList_QNAME, ArrayOfGateDataResponseType.class, DataResponseType.class, value);
     }
 
 }
