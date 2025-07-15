@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tempuri.FBPGateProd;
 import org.tempuri.FBPGateService;
+import org.tempuri.IFBPGateProd;
 import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
 import ua.avtor.DsLib.CertificateException;
@@ -56,9 +57,9 @@ public class AppConfiguration {
 
 
     @Bean(name="gateProd")
-    public IFBPGateService getGateProd() {
+    public IFBPGateProd getGateProd() {
         FBPGateProd service = new FBPGateProd();
-        IFBPGateService gate = service.getWSHttpBindingFBPGate();
+        IFBPGateProd gate = service.getWSHttpBindingFBPGate();
 
         Map<String, Object> requestContext = ((BindingProvider)gate).getRequestContext();
         requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 9000); // Timeout in millis

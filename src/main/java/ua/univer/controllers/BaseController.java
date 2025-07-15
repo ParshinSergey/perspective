@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tempuri.FBPGateService;
+import org.tempuri.IFBPGateProd;
 import org.tempuri.IFBPGateService;
 import ua.avtor.DsLib.Certificate;
 import ua.avtor.DsLib.CertificateException;
@@ -42,7 +43,7 @@ public class BaseController {
 
     protected final HttpClient httpClient;
     protected final IFBPGateService gateTest;
-    protected final IFBPGateService gateProd;
+    protected final IFBPGateProd gateProd;
     protected final CertGenerator genRSA;
     protected final cDevice dev;
     protected final KeyStore keyStore;
@@ -53,7 +54,7 @@ public class BaseController {
     protected String pin = "12345678";
 
 
-    public BaseController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateService gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
+    public BaseController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateProd gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         this.httpClient = httpClient;
         this.gateTest = gateTest;
         this.gateProd = gateProd;

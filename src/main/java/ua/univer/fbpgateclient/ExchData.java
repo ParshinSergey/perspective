@@ -28,9 +28,7 @@ public static final int AllChanges = 15;
 public static final int BrokerAccounts = 16;
 public static final int Quotes = 17;
 public static final int Level2 = 18;
-//--------------------------------
 public static final int FBPBrokers = 19;
-//--------------------------------
 public static final int AddressOrders = 20;
 public static final int NewAddressOrder = 21;
 public static final int RemoveAddressOrder = 22;
@@ -38,19 +36,28 @@ public static final int QwitAddressOrder = 23;
 public static final int QwitCrossAddressOrder = 24;
 public static final int RejectCrossAddressOrder = 25;
 public static final int ContractTNAccept = 26;
-
 public static final int ContractProlongationRequest = 27;
 public static final int ContractProlongList = 28;
 public static final int ContractProlongationAnswer = 29;
-
 public static final int ContractAnnulmentReqest = 30;
 public static final int ContractAnnulmentList = 31;
-
 public static final int ContractOneSideReject = 32;
 public static final int ContractOneSideRejectList = 33;
+
 public static final int AddNewClient = 37;
+
+public static final int MarketOrdersChangesByArm = 44;
 public static final int AddressOrdersChangesByArm = 45;
+public static final int AllChangesByArm = 46;
 public static final int AuthorizationCheck = 47;
+
+public static final int NewRepoOrder = 50;
+public static final int Contracts2 = 51;
+public static final int ContractTNAccept2 = 52;
+public static final int RepoOrders = 53;
+public static final int NewContractAmendment = 54;
+public static final int ContractAmendments = 55;
+public static final int ContractReject = 56;
 //--------------------------------
 public static final int Unknown = 9999;
 }

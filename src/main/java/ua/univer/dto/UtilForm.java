@@ -5,10 +5,15 @@ import ua.univer.BIT.cDevice;
 import ua.univer.exeptions.UnprocessableEntityException;
 import ua.univer.fbpgateclient.AddressOrder;
 import ua.univer.fbpgateclient.NewClient;
+import ua.univer.fbpgateclient.RepoOrder;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import static ua.univer.util.DateTimeUtil.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 public class UtilForm {
@@ -145,6 +150,67 @@ public class UtilForm {
         order.setApplicationContextUnique(form.getApplicationContextUnique());
 
         return order;
+
+
+    }
+
+    public static RepoOrder convertFormToRepoOrder (FormRepoOrder form){
+
+        RepoOrder order = new RepoOrder();
+        order.setApplicationID(form.getApplicationID());
+        order.setCrossApplicationID(form.getCrossApplicationID());
+        order.setCreateDate(xmlGregorianCalendar(LocalDateTime.now()));
+        order.setBrokerID(form.getBrokerID());
+        order.setArmID(cDevice.armID);
+        order.setIsBuy(form.getIsBuy());
+        order.setOrderType(form.getOrderType());
+        order.setAccount(form.getAccount());
+        order.setIsin(form.getIsin());
+        order.setQuantity(form.getQuantity());
+        order.setPrice(form.getPrice());
+        order.setPricePart2(form.getPricePart2());
+        order.setContractSum(new BigDecimal(form.getContractSum()));
+        order.setContractSumPart2(new BigDecimal(form.getContractSumPart2()));
+        order.setClientID(form.getClientID());
+        order.setClientName(form.getClientName());
+        order.setClientEDRPOU(form.getClientEDRPOU());
+        order.setClientINN(form.getClientINN());
+        order.setClientEDRISI(form.getClientEDRISI());
+        order.setClientCode(form.getClientCode());
+        order.setContractNum(form.getContractNum());
+        order.setContractText(form.getContractText());
+        order.setContractNumPart2(form.getContractNumPart2());
+        order.setContractTextPart2(form.getContractTextPart2());
+        order.setTermDate(oneBoxCalendar(form.getTermDate()));
+        order.setTermDatePart2(oneBoxCalendar(form.getTermDatePart2()));
+        order.setRepoRate(form.getRepoRate());
+        order.setRepoRateSum(form.getRepoRateSum());
+        order.setIsDisposeOfCP(form.getIsDisposeOfCP());
+        order.setCouponRecipient(form.getCouponRecipient());
+        order.setCouponSum(form.getCouponSum());
+        order.setCouponRequisites(form.getCouponRequisites());
+        order.setCouponCurrencyRate(form.getCouponCurrencyRate());
+        order.setIsAddressToBroker(form.getIsAddressToBroker());
+        order.setToBrokerID(form.getToBrokerID());
+        order.setToBrokerEdrpou(form.getToBrokerEdrpou());
+        order.setIsCCP(form.getIsCCP());
+        order.setTradeCurrency(form.getTradeCurrency());
+        order.setApplicationContext(UUID.randomUUID().toString());
+        order.setApplicationContextUnique(UUID.randomUUID().toString());
+        // isComplete;
+        // isRemoval;
+        // isRejected;
+        // description;
+        order.setAccount2(form.getAccount2());
+        order.setClientCode2(form.getClientCode2());
+        order.setClientID2(form.getClientID2());
+        order.setContractNum2(form.getContractNum2());
+        order.setContractText2(form.getContractText2());
+        order.setContractNum2Part2(form.getContractNum2Part2());
+        order.setContractText2Part2(form.getContractText2Part2());
+
+        return order;
+
     }
 
 

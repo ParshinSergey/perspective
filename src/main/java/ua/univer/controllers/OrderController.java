@@ -3,17 +3,20 @@ package ua.univer.controllers;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tempuri.IFBPGateProd;
 import org.tempuri.IFBPGateService;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.CertGenerator;
 import ua.univer.BIT.KeyStore;
 import ua.univer.BIT.cDevice;
 import ua.univer.dto.FormOrder;
+import ua.univer.dto.FormRepoOrder;
 import ua.univer.dto.UtilForm;
 import ua.univer.exeptions.MyException;
 import ua.univer.fbpgateclient.AddressOrder;
 import ua.univer.fbpgateclient.DocumentElement;
 import ua.univer.fbpgateclient.ExchData;
+import ua.univer.fbpgateclient.RepoOrder;
 import ua.univer.util.ConverterUtil;
 
 import javax.validation.Valid;
@@ -27,7 +30,7 @@ import static ua.univer.util.FileUtil.writeStringToFile;
 public class OrderController extends BaseController{
 
 
-    public OrderController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateService gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
+    public OrderController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateProd gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         super(httpClient, gateTest, gateProd, genRSA, dev, keyStore);
     }
 
@@ -113,6 +116,32 @@ public class OrderController extends BaseController{
         return ResponseEntity.ok().body(ConverterUtil.objectToJson(result));
     }
 */
+
+    @PostMapping(value = "/v1/newRepoOrder")
+    public ResponseEntity<String> newRepoOrder (@RequestBody @Valid FormRepoOrder form){
+
+        logger.info("Method NewRepoOrder. TEST.");
+        DocumentElement document = new DocumentElement();
+        RepoOrder order = UtilForm.convertFormToRepoOrder(form);
+        document.repoOrders.add(order);
+
+        String xmlString = ConverterUtil.objectToXML(document);
+        writeStringToFile(xmlString, "NewRepoOrder", ".xml");
+
+        byte[] signedXml = tokenLib.SignData(dev.getCertificate(), dev.UsbSlot, pin, xmlString.getBytes(StandardCharsets.UTF_8), true, avPath, err);
+        byte[] crypt = BIT_PKCS11CL3.Encrypt(signedXml, KeyStore.sessionKey, err);
+        byte[] response = gateTest.sendXMLResponse(cDevice.armID, crypt, ExchData.NewRepoOrder, false);
+        byte[] decryptedResponse = BIT_PKCS11CL3.Decrypt(response, KeyStore.sessionKey, err);
+
+        if(decryptedResponse == null) throw new MyException("Response is null");
+        String responseStr = new String(decryptedResponse, StandardCharsets.UTF_8);
+        writeStringToFile( responseStr, "Response", ".xml");
+        DocumentElement de = ConverterUtil.xmlToObject(responseStr, DocumentElement.class);
+        if (de.getRepoOrders() == null) throw new MyException("Список RepoOrders пуст");
+        RepoOrder result = de.getRepoOrders().get(0);
+
+        return ResponseEntity.ok().body(ConverterUtil.objectToJson(result));
+    }
 
 
 }

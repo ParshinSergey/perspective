@@ -6,8 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.tempuri.FBPGateProd;
-import org.tempuri.FBPGateService;
+import org.tempuri.IFBPGateProd;
 import org.tempuri.IFBPGateService;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.CertGenerator;
@@ -31,7 +30,7 @@ import static ua.univer.util.FileUtil.writeStringToFile;
 public class LoginController extends BaseController{
 
 
-    public LoginController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateService gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
+    public LoginController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateProd gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         super(httpClient, gateTest, gateProd, genRSA, dev, keyStore);
     }
 

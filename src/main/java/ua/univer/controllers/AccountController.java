@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.tempuri.IFBPGateProd;
 import org.tempuri.IFBPGateService;
 import ua.univer.BIT.BIT_PKCS11CL3;
 import ua.univer.BIT.KeyStore;
@@ -30,7 +31,7 @@ import static ua.univer.util.FileUtil.writeStringToFile;
 public class AccountController extends BaseController{
 
 
-    public AccountController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateService gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
+    public AccountController(HttpClient httpClient, IFBPGateService gateTest, IFBPGateProd gateProd, CertGenerator genRSA, cDevice dev, KeyStore keyStore) {
         super(httpClient, gateTest, gateProd, genRSA, dev, keyStore);
     }
 

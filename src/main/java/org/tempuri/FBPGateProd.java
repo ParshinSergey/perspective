@@ -60,8 +60,8 @@ public class FBPGateProd extends Service
      *     returns IFBPGateService
      */
     @WebEndpoint(name = "WSHttpBinding_FBPGate")
-    public IFBPGateService getWSHttpBindingFBPGate() {
-        return super.getPort(new QName("http://tempuri.org/", "WSHttpBinding_FBPGate"), IFBPGateService.class);
+    public IFBPGateProd getWSHttpBindingFBPGate() {
+        return super.getPort(new QName("http://tempuri.org/", "WSHttpBinding_FBPGate"), IFBPGateProd.class);
     }
 
     /**
@@ -72,8 +72,8 @@ public class FBPGateProd extends Service
      *     returns IFBPGateService
      */
     @WebEndpoint(name = "WSHttpBinding_FBPGate")
-    public IFBPGateService getWSHttpBindingFBPGate(WebServiceFeature... features) {
-        return super.getPort(new QName("http://tempuri.org/", "WSHttpBinding_FBPGate"), IFBPGateService.class, features);
+    public IFBPGateProd getWSHttpBindingFBPGate(WebServiceFeature... features) {
+        return super.getPort(new QName("http://tempuri.org/", "WSHttpBinding_FBPGate"), IFBPGateProd.class, features);
     }
 
     private static URL __getWsdlLocation() {
